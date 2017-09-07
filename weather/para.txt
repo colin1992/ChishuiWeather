@@ -1,0 +1,7 @@
+0  D:/file/data.dat
+1  D:/file/
+2  rainbow
+3  D:/file/mainArea.bln
+4  D:/file/Lvl/rainbow24.lvl
+5  D:/file/black.bln
+6  ?????

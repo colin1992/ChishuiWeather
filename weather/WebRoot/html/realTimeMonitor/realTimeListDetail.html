@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<script type="text/javascript" src="../../js/tools/jquery-1.9.1.min.js"></script>
+<head>
+    <meta charset="UTF-8">
+    <title>实时信息详情</title>
+    <style>
+        html,body{
+            font-family:"微软雅黑";
+            height:99%;
+            width:100%;
+            min-height: 600px;
+            min-width: 1450px;
+        }
+        .pageHead{
+            height: 8%;
+            min-height:  60px;
+            width: 98%;
+            border: 1px solid #eeeeee;
+            line-height: 60px;
+        }
+        .title{
+            font-weight: bold;
+            font-size: 20px;
+            margin-left: 30px;
+            float: left;
+        }
+        .backButton{
+            background: #1bf7a3;
+            text-align:center;  /*是文字水平居中*/
+            line-height: 40px;  /*使文字垂直居中*/
+            margin-right:10px;
+            margin-top: 10px;
+            height: 40px;;
+            width:80px;
+            color:white;
+            cursor: pointer;
+        }
+        .backButton:hover {
+	        color: white;
+	        background: #61d37c;
+    	}
+        .stationInfo{
+            margin-top: 2%;
+            height:18%;
+            width:98%;
+            border: 1px solid #eeeeee;
+        }
+        .temInfo{
+            margin-top: 2%;
+            height:18%;
+            width:98%;
+            border: 1px solid #eeeeee;
+        }
+        .rainFall{
+            margin-top: 2%;
+            height:18%;
+            width:98%;
+            border: 1px solid #eeeeee;
+        }
+        .humidity{
+            margin-top: 2%;
+            height:10%;
+            width:98%;
+            border: 1px solid #eeeeee;
+        }
+    </style>
+</head>
+<body>
+    <div class="pageHead">
+        <span class="title">
+            站点监控详细信息
+        </span>
+        <span style="margin-left: 10%;background-color: #D91600;color: white" id="monitorTime">
+            监测时间： 2017.03.18 15:39
+        </span>
+        <span class ="backButton" style="float: right">
+            返回
+        </span>
+    </div>
+    <div class="stationInfo">
+        <div style="width: 100%; height: 50%;line-height: 100px;">
+            <span style="width: 10%;display:inline-block;line-height: 50px; text-align: right">
+                站点名称：
+            </span>
+            <span id="stationName" style="width: 8%; display:inline-block;">
+                永安站
+            </span>
+            <span style="width: 8%; display:inline-block;text-align: right">
+                站点编号：
+            </span>
+            <span id="stationNum" style="width: 8%;display:inline-block;">
+                R2083
+            </span>
+            <span style="width: 8%;display:inline-block;text-align: right">
+                所属地区：
+            </span>
+            <span id="county" style="width: 8%;display:inline-block;">
+                赤水市
+            </span>
+        </div>
+        <div style="width: 100%; height: 50%;line-height: 50px;">
+            <span style="width: 10%;display:inline-block;line-height: 50px; text-align: right">
+                站点经度：
+            </span>
+            <span id="stationLat" style="width: 8%; display:inline-block;">
+                50
+            </span>
+            <span style="width: 8%; display:inline-block;text-align: right">
+                站点纬度：
+            </span>
+            <span id="stationLon" style="width: 8%;display:inline-block;">
+                80
+            </span>
+        </div>
+    </div>
+    <div class="humidity">
+        <div style="width: 100%; height: 50%;line-height: 100px;">
+            <!--<span style="width: 10%;display:inline-block;line-height: 50px; text-align: right">
+                露点湿度：
+            </span>
+            <span id="" style="width: 8%; display:inline-block;">
+                20
+            </span>-->
+            <span style="width: 10%;display:inline-block;line-height: 50px; text-align: right">
+                相对湿度：
+            </span>
+            <span id="humi_re" style="width: 8%;display:inline-block;">
+                2
+            </span>
+            <span style="width: 8%;display:inline-block;text-align: right">
+                最小相对湿度：
+            </span>
+            <span id="humi_re_min" style="width: 8%;display:inline-block;">
+                10
+            </span>
+        </div>
+    </div>
+    <div class="temInfo">
+        <div style="width: 100%; height: 50%;line-height: 100px;">
+            <span style="width: 10%;display:inline-block;line-height: 50px; text-align: right">
+                平均温度：
+            </span>
+            <span id="Tem" style="width: 8%; display:inline-block;">
+                20℃
+            </span>
+            <span style="width: 8%; display:inline-block;text-align: right">
+                最高气温：
+            </span>
+            <span id="temMax" style="width: 8%;display:inline-block;">
+                25℃
+            </span>
+            <span style="width: 8%;display:inline-block;text-align: right">
+                最低气温：
+            </span>
+            <span id="temMin" style="width: 8%;display:inline-block;">
+                10℃
+            </span>
+        </div>
+        <div style="width: 100%; height: 50%;line-height: 50px;">
+            <span style="width: 15%;display:inline-block;text-align: right;min-width: 60px;">
+                过去24小时最高气温：
+            </span>
+            <span id="temPre24Max" style="width: 8%; display:inline-block;">
+                26℃
+            </span>
+            <span style="width: 15%; display:inline-block;text-align: right;min-width: 60px;">
+                过去24小时最低气温：
+            </span>
+            <span id="temPre24Min" style="width: 8%;display:inline-block;">
+                9℃
+            </span>
+        </div>
+    </div>
+    <div class="rainFall">
+        <div style="width: 100%; height: 50%;line-height: 100px;">
+            <span style="width: 15%;display:inline-block;text-align: right;min-width: 60px;">
+                过去1小时降雨量：
+            </span>
+             <span id="RainPre1" style="width: 8%; display:inline-block;">
+                0
+            </span>
+            <span style="width: 15%; display:inline-block;text-align: right;min-width: 60px;">
+                过去3小时降雨量：
+            </span>
+            <span id="RainPre3" style="width: 8%;display:inline-block;">
+                0
+            </span>
+            <span style="width: 15%; display:inline-block;text-align: right;min-width: 60px;">
+                过去6小时降雨量：
+            </span>
+            <span id="RainPre6" style="width: 8%;display:inline-block;">
+                0
+            </span>
+        </div>
+        <div style="width: 100%; height: 50%;line-height: 50px;">
+            <span style="width: 15%;display:inline-block;text-align: right;min-width: 60px;">
+                过去12小时降雨量：
+            </span>
+            <span  id="RainPre12" style="width: 8%; display:inline-block;">
+                0
+            </span>
+            <span style="width: 15%; display:inline-block;text-align: right;min-width: 60px;">
+                过去24小时降雨量：
+            </span>
+            <span  id="RainPre24" style="width: 8%;display:inline-block;">
+                0
+            </span>
+        </div>
+    </div>
+
+    <script>
+        //返回按钮
+        $(".backButton").click(function(){
+            $(window.parent.document).find(".mainArea").attr("src","html/realTimeMonitor/realTimeList.html");
+        })
+        //通过station的编号来获取相应的站点的更加详细的气象信息
+        var localstroage = window.localStorage; 
+		var stationCode = localstroage.getItem('stationCode'); 
+        $.ajax({
+	   		cache: false,
+	   		dataType:'json',
+	   		type: "post",
+	   		url:"../../weather/getRealTimeWeatherDetail",
+	   		data:{
+	   			"stationCode":stationCode
+	   		},
+	   		async: false,
+	   		success: function(json) {
+				if(json.statusCode){
+					 //检测时间
+		            var now = new Date();
+		            var monitorTime = "检测时间："+now.getFullYear()+"."+(now.getMonth()+1)+"."+now.getDate()+" "+now.getHours()+":00"
+		            $("#monitorTime").text(monitorTime);
+		            //监测站信息
+		            $("#stationName").text(json.station.name);
+		            $("#stationNum").text(json.station.code);
+		            $("#county").text(json.station.area);
+		            $("#stationLat").text(json.station.lat+"°");
+		            $("#stationLon").text(json.station.lng+"°");
+		            $("#RainPre1").text(json.station.weather.rainfall_1h+"mm");
+		            $("#RainPre3").text(json.station.weather.rainfall_3h+"mm");
+		            $("#RainPre6").text(json.station.weather.rainfall_6h+"mm");
+		            $("#RainPre12").text(json.station.weather.rainfall_12h+"mm");
+		            $("#RainPre24").text(json.station.weather.rainfall_24h+"mm");
+		            $("#humi_re").text(json.station.weather.humi_re+"%");
+		            $("#humi_re_min").text(json.station.weather.humi_re_min+"%");
+		            $("#Tem").text(json.station.weather.temp_ave+"℃");
+		            $("#temMax").text(json.station.weather.temp_high+"℃");
+		            $("#temMin").text(json.station.weather.temp_low+"℃");
+		            $("#temPre24Max").text(json.station.weather.temp_24_max+"℃");
+		            $("#temPre24Min").text(json.station.weather.temp_24_min+"℃");
+       			}
+				else{
+					layer.alert(json.err, {
+		  				  icon: 2,
+		  				  skin: 'layer-ext-moon'
+		  				})
+				}
+	   		},
+	   		error:function(XMLHttpRequest,Error,F,data){
+	   	        layer.alert("访问出错了:"+XMLHttpRequest.status+Error,{icon:2});
+	   	 	}
+   	});
+    </script>
+</body>
+</html>

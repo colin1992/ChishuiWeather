@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+    <beans xmlns="http://www.springframework.org/schema/beans"  
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
+        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">  
+      
+        <bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor"></bean>  
+        <!-- 数据库保存的密码是使用MD5算法加密的，所以这里需要配置一个密码匹配对象 -->  
+        <bean id="credentialsMatcher" class="org.apache.shiro.authc.credential.Md5CredentialsMatcher"></bean>  
+        <!-- 缓存管理 -->  
+        <bean id="cacheManager" class="org.apache.shiro.cache.MemoryConstrainedCacheManager"></bean> 
+        <bean id="shiroCacheManager" class="org.apache.shiro.cache.ehcache.EhCacheManager"> </bean>
+       <!--   
+           Web应用中，Shiro可控制的Web请求必须经过Shiro主过滤器的拦截，Shiro对基于Spring的Web应用提供了完美的支持   
+        -->  
+        <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">  
+            <!-- Shiro的核心安全接口，这个属性是必须的 -->  
+            <property name="securityManager" ref="securityManager"></property>  
+            <!-- 要求登录时的链接(登录页面地址)，非必须的属性，默认会自动寻找Web工程根目录下的"/login.jsp"页面 -->  
+            <property name="loginUrl" value="/Login.html"></property>  
+            <!-- 登录成功后要跳转的连接 -->  
+            <property name="successUrl" value="main.html" ></property>   
+            <!-- 用户访问未对其授权的资源时，所显示的连接 -->  
+            <property name="unauthorizedUrl" value=""></property>  
+            <!--  拦截器定义-->
+            <property name="filterChainDefinitions">  
+         <value>  
+         <!--权限配置 拦截器采用从上到下的匹配查找
+                          一旦发现匹配的设置项便不再继续向下查找
+                         从而应充分注意配置的顺序
+                         尤其是通用匹配符*
+         -->
+         <!-- 登录验证 -->
+         <!-- 给静态资源添加例外 -->
+<!--           /**/*.png=anon -->
+<!--           /**/*.css=anon -->
+<!--           /**/*.js=anon -->
+<!--           /**/*.gif=anon -->
+<!--           /**/*.cur=anon  -->
+<!--           /**/*.jpg=anon -->
+<!--           /**/*.xml=anon -->
+<!--           /main.html=user,authc -->
+<!--           /mainL.html=user,authc -->
+<!--           /**/*.html=anon -->
+<!--           /**/dataSource=anon  -->
+<!--           /**/dologin=anon登录操作 -->
+<!--           /**/checkSession=anon验证session -->
+<!--           /**/Login.html=anon  登录页面直接授权访问 -->
+<!--           /**/login/**=anon -->
+<!--           /**/isAccountExit=anon -->
+<!--           /**/account/reSetPword=anon -->
+<!--           /**/account/getVerifyCode=anon -->
+<!--           /**/account/checkVerifyCode=anon -->
+<!--           /**/account/reSetPword=anon -->
+         
+<!--          权限验证 -->
+<!--          /role/addRole=authc,perms[addRole] -->
+<!--          /role/modifyRole=authc,perms[modifyRole] -->
+<!--          /role/delRole=authc,perms[delRole] -->
+<!--         /user/addUser=authc,perms[addUser] -->
+<!--         /user/delUser=authc,perms[delUser] -->
+ <!--         账户 --> 
+<!--         /account/modifyPword=authc,perms[modifyPword] -->
+<!--         /account/modifyInfo*=authc,perms[modifyInfo] -->
+ 		 <!--除登录页面和静态资源外所有操作都需要先登录  -->
+<!-- 		  /**=authc,user  -->
+<!--           /**/**=authc,user  -->
+       </value>  
+            </property>  
+        </bean>  
+      
+             <!-- Shiro安全管理器 -->  
+        <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">  
+        <!-- Shiro默认的realm -->
+<!--             <property name="realm" ref="jdbcRealm"></property>   -->
+            <!-- 继承实现的realm -->
+ 			  <property name="realm" ref="weatherShiroRealm"/> 
+ 			  <property name="cacheManager" ref="cacheManager"></property>  
+        </bean> 
+        <bean id="weatherShiroRealm" class="weather.shiro.realm.ShiroDaoRealm"> 
+			<!-- 注入MD5密码适配容器 -->
+			 <property name="credentialsMatcher" ref="credentialsMatcher"></property>
+			 <!-- 注入缓存管理器 -->
+             <property name="cacheManager" ref="shiroCacheManager"/> 
+       </bean> 
+       
+       
+       
+       <bean id="sessionManager" class="org.apache.shiro.web.session.mgt.DefaultWebSessionManager">
+			<property name="sessionDAO" ref="sessionDAO" />
+			 <!-- 定时清理失效会话, 相隔多久检查一次session的有效性 -->
+	         <property name="sessionValidationInterval" value="1800000"/>
+			  <!-- 会话超时时间，单位：毫秒  4h -->
+	        <property name="globalSessionTimeout" value="28800000"/>
+	       
+	        <property name="sessionValidationSchedulerEnabled" value="true"/>
+	        <property name="sessionIdCookie" ref="sessionIdCookie"/>
+	        <property name="sessionIdCookieEnabled" value="true"/>
+	   </bean>
+			<bean id="sessionIdCookie" class="org.apache.shiro.web.servlet.SimpleCookie">
+        		<constructor-arg name="name" value="jeesite.session.id"/>
+   			 </bean>
+			<bean id="sessionDAO" class="org.apache.shiro.session.mgt.eis.MemorySessionDAO" >
+			</bean>
+         <bean id="shiroSecurityHelper" class="weather.shiro.realm.ShiroSecurityHelper">  
+		    <property name="sessionDAO" ref="sessionDAO"/> 
+		     <property name="cacheManager" ref="cacheManager"></property>  
+	     </bean>
+      <!--   
+           开启Shiro的注解(如@RequiresRoles，@RequiresPermissions)，需借助SpringAOP扫描使用Shiro注解的类，  
+           并在必要时进行安全逻辑验证  
+        -->  
+       <bean  
+            class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator"></bean>  
+        <bean  
+            class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">  
+            <property name="securityManager" ref="securityManager"></property>  
+        </bean>     
+    </beans>  

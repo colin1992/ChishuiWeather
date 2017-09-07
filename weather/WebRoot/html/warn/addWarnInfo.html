@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script type="text/javascript" src="../../js/tools/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="../../js/tools/dtree.js"></script>
+    <script src="../../js/tools/xcConfirm.js" type="javascript" charset="utf-8"></script>
+    <link rel="stylesheet" href="../../css/dtree.css" type="text/css" />
+    <script src="../../js/tools/layer/layer.js"></script>
+    <title>发布报警信息</title>
+    <style>
+        body,html{
+            width:99%;
+            height:99%;
+            min-width: 1450px;
+            min-height: 910px;
+            font-family:"微软雅黑";
+        }
+        .title{
+            height: 8%;
+            min-height:  60px;
+            width: 98%;
+            border: 1px solid #eeeeee;
+            line-height: 70px;
+        }
+        .titleName{
+            margin-left: 5%;
+            font-weight: bold;
+            font-size: 20px;
+        }
+        .warnStrategyName,.warnType,.warnPara,.infoWay{
+            margin-top: 0.5%;
+            height: 6%;
+            min-height:  60px;
+            width: 98%;
+            border: 1px solid #eeeeee;
+            line-height: 60px;
+            font-size: 14px;
+        }
+        .warnContent{
+        	margin-top: 0.5%;
+            height: 24%;
+            min-height:  60px;
+            width: 98%;
+            border: 1px solid #eeeeee;
+            line-height: 30px;
+            font-size: 14px;
+        }
+        .warnStrategyName{
+            margin-top: 1%;
+        }
+        .selectStation{
+            margin-top: 0.5%;
+            height: 24%;
+            min-height:  60px;
+            width: 98%;
+            border: 1px solid #eeeeee;
+            /*line-height: 210px;*/
+            font-size: 14px;
+        }
+        .selectAndStations{
+            height:100%;
+            width:90%;
+            /*border: 1px solid #58ee47;*/
+            float: left;
+        }
+        .stations{
+            margin-top: 0.5%;
+            height:80%;
+            width:85%;
+            border: 1px solid #eeeeee;
+            float: left;
+            line-height: 25px;
+        }
+        .stations label{
+            width: 100px;
+            height: 20px;
+            display:inline-block
+        }
+        .selectPerson{
+            margin-top: 0.5%;
+            height: 24%;
+            min-height:  60px;
+            width: 98%;
+            border: 1px solid #eeeeee;
+            line-height: 210px;
+            font-size: 14px;
+        }
+        .persons{
+            margin-top: 1%;
+            height:80%;
+            width:250px;
+            border: 1px solid #eeeeee;
+            float: left;
+            line-height: 25px;
+        }
+        .paraTable tr div{
+            height:34px;
+            cursor:pointer;
+            margin-top:15px;
+            margin-bottom:15px;
+            line-height:38px;
+            margin-left:15px;
+            border:1px solid #b9b9b9;
+        }
+        .menuBox{
+            float:right;
+            background: #1bf7a3;
+            line-height:40px;
+            text-align:center;
+            margin-right:10px;
+            margin-top:10px;
+            height:40px;
+            width:80px;
+            color:white;
+            cursor: pointer;
+        }
+        .menuBox:hover {
+	        color: white;
+	        background: #61d37c;
+	    }
+      <!-- 表单验证 -->
+     .high{ color: red; }
+     .msg{ font-size: 13px; }
+     .onError{ color: red; }
+     .onSuccess{ color: green; }
+    </style>
+</head>
+<body>
+<div class="title">
+        <span class="titleName">
+            发布报警信息
+        </span>
+</div>
+<div class="warnStrategyName">
+        <span style="margin-left: 5%">
+            报警标题：
+        </span>
+    <input id = "strategyName" class="required" style="width: 250px;height: 20px"/>
+</div>
+<div class="warnType">
+        <span style="margin-left: 5%">
+            报警类别：
+        </span>
+    <label><input name="warnType" id = "rainFall" type="radio" value="rainfall" checked="checked"/>降水量</label>
+    <label><input name="warnType" id = "tem" type="radio" value="temp"/>温度</label>
+</div>
+<div class="warnPara">
+        <span style="margin-left: 5%">
+            报警参数：
+        </span>
+    <label class="rainPara"><input name="rainPara"  type="radio" value="1h" checked="checked"/>1小时降水量</label>
+    <label class="rainPara"><input name="rainPara" type="radio" value="3h"/>3小时降水量</label>
+    <label class="rainPara"><input name="rainPara" type="radio" value="6h"/>6小时降水量</label>
+    <label class="rainPara"><input name="rainPara" type="radio" value="12h"/>12小时降水量</label>
+    <label class="rainPara"><input name="rainPara" type="radio" value="24h"/>24小时降水量</label>
+    <label class="temPara"><input name="temPara" type="radio" value="ave" checked="checked"/>平均温度</label>
+    <label class="temPara"><input name="temPara" type="radio" value="high"/>最高温度</label>
+    <label class="temPara"><input name="temPara" type="radio" value="low"/>最低温度</label>
+</div>
+<div class = "infoWay">
+	<span style="margin-left: 5%">
+            预警方式：
+    </span>
+    <label><input type="checkbox" id="isSms" name="selectButton"/>发送短信</label>
+    <label><input type="checkbox" id="isTel" name="selectButton" />拨打电话</label>
+    <label><input type="checkbox" id="isEmail" name="selectButton"/>发送邮件</label>
+</div>
+<div class="warnContent">
+        <span style="margin-left: 5%;float: left;margin-top: 80px">
+            报警内容：
+        </span>
+        <textarea id = "warnContent"  rows="8" cols="50" style="resize:none;margin-top:25px"></textarea>
+        <div style="margin-top:10px">
+        <span style="margin-left: 5%;float: left;">
+            	试听语音：
+        </span>
+        <audio id="m" src="" controls="controls"></audio>
+		</div>
+</div>
+
+<div class="selectStation" >
+        <span style="margin-left: 5%;float: left;margin-top: 100px">
+            选择站点：
+        </span>
+    <div class="selectAndStations">
+        <div style="margin-top: 5px" id = "areas">
+            <label><input type="checkbox" id="allStations" name="selectButton" onclick="clickQuanXuan()" />全选</label>
+            <label><input type="checkbox" id="chishuiStations" name="selectButton" onclick="clickChishui()"/>赤水市</label>
+            <label><input type="checkbox" id="renhuaiStations" name="selectButton" onclick="clickRenhuai()"/>仁怀市</label>
+            <label><input type="checkbox" id="xishuiStations" name="selectButton" onclick="clickXishui()"/>习水县</label>
+        </div>
+        <div class="stations">          
+        </div>
+    </div>
+</div>
+<div class="selectPerson">
+        <span style="margin-left: 5%;float: left">
+            选择人员：
+        </span>
+    <div class="persons" id="tree" style="height:200px;overflow-y:auto">
+    </div>
+</div>
+<table class="paraTable">
+    <tr>
+        <!---用来设置margin--->
+        <td style="width:60px"></td>
+        <td>
+            <div class="menuBox" id="menuConfirm">
+                <span>发布</span>
+            </div>
+        </td>
+        <td style="width:60px"></td>
+        <td>
+            <div class="menuBox" id="menuCancel">
+                <span>取消</span>
+            </div>
+        </td>
+    </tr>
+</table>
+</body>
+<script>
+//预警内容失去焦点后更新语音语音
+	$("#warnContent").blur(function(){
+		var x=document.getElementById("m");
+		var text = $("#warnContent").val(); 
+		x.src = document.location.href.split('weather')[0]+"weather/warn/getWarnAudio?context="+text;	
+	});
+	
+    $(function(){
+        $(".rainPara").show();
+        $(".temPara").hide();
+        $("#unitRain").show();
+        $("#unitTem").hide();
+        //人员树的操作
+        tree = new dTree('tree');//创建一个对象.
+        tree.config.folderLinks=true;
+        tree.config.useCookies=false;
+        tree.config.check=true;
+        //从数据库中获取所有的人员信息
+        $.ajax({
+       		cache: false,
+       		dataType:'json',
+       		type: "post",
+       		url:"../../warn/getLiaisonsInfo",
+       		traditional:true, 
+       		data:null,
+       		async: false,
+       		success: function(json) {
+       			if(json.statusCode){
+       				/**根节点**/
+           	        var nodeNameRoot = "预警用户";
+           	        tree.add(0,-1,nodeNameRoot,"","","","","",false);
+           	        /**组别信息**/
+           	        var groupInfo = json.liaisonUnits;
+           	         for(var i =0;i<groupInfo.length;i++){
+           	        	var nodeId = "g_"+groupInfo[i].id;
+           	        	var parentId=0;//读取节点pid
+           	        	var nodeName="<input type='checkbox' class='permCheck' value="+parentId+" id='"+nodeId+"'  style='width: 15px;height:15px;vertical-align:middle; '>"+groupInfo[i].name;
+           	        	tree.add(nodeId,parentId,nodeName,"","","","","",false);
+           	        } 
+           	        /**人员信息**/
+           	        var memberInfo = json.liaisons;
+           	         for(var i =0;i<memberInfo.length;i++){
+           	        	var nodeId = memberInfo[i].id;
+           	        	var parentId="g_"+memberInfo[i].unitId;//读取节点pid
+           	        	var nodeName="<input type='checkbox' class='permCheck memberPerCheck' name='checkboxAuthority' value="+parentId+" id='"+nodeId+"'  style='width: 15px;height:15px;vertical-align:middle; '>"+memberInfo[i].name;
+           	        	tree.add(nodeId,parentId,nodeName,"","","","","",false);
+           	        }
+           	        document.getElementById("tree").innerHTML = tree;
+       			}
+       			else{
+       				layer.alert(json.err, {
+  	  				  icon: 2,
+  	  				  skin: 'layer-ext-moon'
+  	  				})
+       			} 
+       		},
+       		error:function(XMLHttpRequest,Error,F,data){
+       			layer.confirm("访问出错了:"+XMLHttpRequest.status+Error, {
+	 	   	    	   icon:2,
+	 	   	    	   btn: ['确定'] //可以无限个按钮
+	 	   	    	  ,btn1: function(index, layero){
+	 		   	    		layer.alert("数据为："+data, {
+	 		  				  icon: 2,
+	 		  				  skin: 'layer-ext-moon'
+	 		  				})
+	 	   	    	  	}
+	 	   	    	});
+       	 	}
+       	}); 
+
+        $(".permCheck").on("click",function(){
+            var value=this.id;
+            var allChildren = $("input[value='"+value+"']");
+            for(var i =0;i<allChildren.length;i++){
+                allChildren[i].checked = this.checked;
+            }
+        })
+    });
+
+
+
+    $("#rainFall").click(function(){
+        $(".rainPara").show();
+        $(".temPara").hide();
+    });
+    $("#tem").click(function(){
+        $(".rainPara").hide();
+        $(".temPara").show();
+    })
+
+
+    function clickQuanXuan(){
+        if($("#allStations").is(':checked')==true)
+            $(".selectAllStations").prop("checked",true);
+        else
+            $(".selectAllStations").prop("checked",false);
+    }
+    function clickChishui(){
+        if($("#chishuiStations").is(':checked')==true)
+            $(".selectChishuiStations").prop("checked",true);
+        else
+            $(".selectChishuiStations").prop("checked",false);
+    }
+       function clickRenhuai(){
+         if($("#renhuaiStations").is(':checked')==true)
+             $(".selectRenhuaiStations").prop("checked",true);
+         else
+             $(".selectRenhuaiStations").prop("checked",false);
+     }
+     function clickXishui(){
+         if($("#xishuiStations").is(':checked')==true)
+             $(".selectXishuiStations").prop("checked",true);
+         else
+             $(".selectXishuiStations").prop("checked",false);
+     }
+     //增加按钮的点击事件
+    $("#menuConfirm").click(function(){
+    	//首先进行表单验证，保证必要项都填写了
+    	$(".required").trigger("blur"); 
+    	validateStations();
+    	validatePeople();
+        var numError = $(".onError").length;
+        if(numError){
+            return false;
+        }
+    	//获取策略名称
+        var strategyName = $("#strategyName").val();
+        //获取预警类型
+    	var warnType = $("input[name='warnType']:checked").val();
+        //获取预警要素
+        if(warnType=="rainfall")
+        	var warnTypeEle =  $("input[name='rainPara']:checked").val();
+        else if(warnType == "tem")
+        	var warnTypeEle =  $("input[name='temPara']:checked").val();
+        //获取被选择的监测站
+        var allStations = $(".selectAllStations");
+		var allStationNum = $(".selectAllStations").length;
+		var selectedStations =[];
+		 for(var i = 0 ; i<allStationNum;i++){
+			 if($(allStations[i]).is(':checked')==true){
+				 selectedStations.push(allStations[i].value);
+			} 
+		} 
+		//获取被选择的人员信息
+		var allPeople = $(".memberPerCheck");
+		var selectedPeople = new Array();
+ 		for(var i =0;i<allPeople.length;i++){
+ 			if($(allPeople[i]).is(':checked'))
+ 				selectedPeople.push(parseInt(allPeople[i].id));
+		} 
+ 		//获取预警方式 infoWay是一个三位的字符串，1表示选中，0表示未选中，顺序为短信、电话、邮件
+ 		var infoWay = "";
+ 		if($("#isSms").is(':checked'))
+ 			infoWay = infoWay+"1";
+ 		else
+ 			infoWay = infoWay +"0";
+ 		if($("#isTel").is(':checked'))
+ 			infoWay = infoWay + "1";
+ 		else
+ 			infoWay = infoWay + "0";
+ 		if($("#isEmail").is(':checked'))
+ 			infoWay = infoWay +"1";
+ 		else
+ 			infoWay = infoWay +"0";
+ 		//获取告警内容
+ 		var warnContent = $("#warnContent").val();
+ 		//向后台发出请求增加告警策略;
+  		$.ajax({
+       		cache: false,
+       		dataType:'json',
+       		type: "post",
+       		url:"../../warn/releaseWarn",
+       		traditional:true, 
+       		data:{
+       			"strategyName":strategyName,
+       			"warnType":warnType,
+       			"warnTypeEle":warnTypeEle,  			
+       			"selectedStations":selectedStations,
+       			"selectedPeople":selectedPeople,
+       			"status":false,
+       			"warnContent":warnContent,
+       			"infoWay":infoWay
+       		},
+       		async: false,
+       		success: function(json) {
+       			if(json.statusCode){
+       				layer.confirm("发布预警信息成功！", {
+  	 	   	    	   icon:1,
+  	 	   	    	   btn: ['确定'] //可以无限个按钮
+  	 	   	    	  ,btn1: function(index, layero){
+  	 	   	    			$(window.parent.document).find(".mainArea").attr("src","html/warn/warnList.html");
+  	 	   	    	  }
+  	 	   	    	});
+       			}
+       			else{
+       				layer.alert(json.err, {
+  	  				  icon: 2,
+  	  				  skin: 'layer-ext-moon'
+  	  				})
+       			}
+       		},
+       		error:function(XMLHttpRequest,Error,F,data){
+       			layer.confirm("访问出错了:"+XMLHttpRequest.status+Error, {
+	 	   	    	   icon:2,
+	 	   	    	   btn: ['确定'] //可以无限个按钮
+	 	   	    	  ,btn1: function(index, layero){
+	 		   	    		layer.alert("数据为："+data, {
+	 		  				  icon: 2,
+	 		  				  skin: 'layer-ext-moon'
+	 		  				})
+	 	   	    	  }
+	 	   	    	});
+       	 	}
+       	});
+ 		
+        //$(window.parent.document).find(".mainArea").attr("src","html/warn/warnStrategy.html");
+    })
+    $("#menuCancel").click(function(){
+        $(window.parent.document).find(".mainArea").attr("src","html/warn/warnList.html");
+    })
+    
+    //从数据库中获取所有的监测站的相关信息，然后将他们呈现在页面上
+    $.ajax({
+       		cache: false,
+       		dataType:'json',
+       		type: "post",
+       		url:"../../warn/getStationInfo",
+       		traditional:true, 
+       		data:null,
+       		async: false,
+       		success: function(json) {
+	       			if(json.statusCode){
+	       				var stations = json.stations;
+	       				var rows = stations.length/10+1;
+		       		    for(var i = 0;i<rows;i++){
+		       		        $(".stations").append("<div>");
+		       		        for(var k =0;k<10;k++){
+		       		            if(stations[k+i*10]==undefined)
+		       		                break;
+		       		            var classContent = "";
+		       		            if(stations[k+i*10].areaCode=="520381")
+		       		            	classContent="selectAllStations selectChishuiStations";
+		       		            else if(stations[k+i*10].areaCode=="520382")
+		       		            	classContent="selectAllStations selectRenhuaiStations";
+		       		            else if(stations[k+i*10].areaCode=="520330")
+		       		            	classContent="selectAllStations selectXishuiStations";
+		       		            $(".stations").append("<label><input "+"class='"+classContent+"' value='"+stations[k+i*10].code+"' "+"type='checkbox' name='stations'/>"+stations[k+i*10].name+"</label>");
+		       		        }
+		       		        $(".stations").append("</div>");
+		       		     }
+	       			}
+	       			else{
+	       				layer.alert(json.err, {
+	  	  				  icon: 2,
+	  	  				  skin: 'layer-ext-moon'
+	  	  				})
+	       			}
+       		},
+       		error:function(XMLHttpRequest,Error,F,data){
+       			layer.confirm("访问出错了:"+XMLHttpRequest.status+Error, {
+	 	   	    	   icon:2,
+	 	   	    	   btn: ['确定'] //可以无限个按钮
+	 	   	    	  ,btn1: function(index, layero){
+	 		   	    		layer.alert("数据为："+data, {
+	 		  				  icon: 2,
+	 		  				  skin: 'layer-ext-moon'
+	 		  				})
+	 	   	    	  }
+	 	   	    	});
+       	 	}
+       	});   
+     //****表单验证*****//
+      $(".required").each(function(){ 
+            //创建元素
+            var $required = $("<strong class='high'>*</strong>");
+            //将它追加到文档中
+            $(this).parent().append($required);
+        });
+      $(".required").blur(function(){
+          //注意：这里的this是DOM对象，$(this)才是jQuery对象
+          var $parent = $(this).parent();
+          //删除之前的错误提醒信息
+          $parent.find(".msg").remove();
+          //验证预警策略名称
+          if($(this).is("#strategyName")){
+              //运用jQuery中的$.trim()方法，去掉首位空格
+              if($.trim(this.value) == ""){// || $.trim(this.value).length < 6
+                  var errorMsg = "报警标题不能为空！";
+                  //class='msg onError' 中间的空格是层叠样式的格式
+                  $parent.append("<span class='msg onError'>" + errorMsg + "</span>"); 
+              }
+              else{
+                  var okMsg=" 输入正确";
+                  $parent.find(".high").remove();
+                  $parent.append("<span class='msg onSuccess'>" + okMsg + "</span>");
+              }                
+          }
+      }).keyup(function(){
+          //triggerHandler 防止事件执行完后，浏览器自动为标签获得焦点
+          $(this).triggerHandler("blur");
+      }).focus(function(){
+          $(this).triggerHandler("blur");
+      });
+      
+      //**站点选择的验证**//
+      function validateStations(){
+    	  $("#areas").find(".msg").remove();
+     		if($('input:checkbox[name = stations]:checked').length==0){
+     		var errorMsg = " 至少选择一个站点！";
+             //class='msg onError' 中间的空格是层叠样式的格式
+             $("#areas").append("<span class='msg onError'>" + errorMsg + "</span>"); 
+   	  	}
+      }
+       $(".selectStation").click(function(){
+    	   validateStations();
+      }) 
+      //**人员选择验证**//
+      function validatePeople(){    //////////因为组别和人员的name没有区分，所以这里把组别当做人员来处理 
+    	   $(".selectPerson").find(".msg").remove();
+    	   if($('input:checkbox[name = checkboxAuthority]:checked').length==0){
+        		var errorMsg = " 至少选择一个人员！";
+                //class='msg onError' 中间的空格是层叠样式的格式
+                $(".selectPerson").append("<span class='msg onError'>" + errorMsg + "</span>"); 
+      	  	}
+       }
+       $(".persons").click(function(){
+    	   validatePeople();
+       })
+</script>
+</html>

@@ -1,0 +1,189 @@
+<html style="overflow:hidden">
+    <head lang="en">
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <meta http-equiv="Pragma" content="no-cache"><!-- http 1.0 -->
+        <meta http-equiv="Cache-Control" content="no-cache"><!-- http 1.1 -->
+        <title>赤水河中下游防汛决策支持与预警平台</title>
+        <script src="js/tools/jquery-1.9.1.min.js" type="text/javascript"></script>
+        <script src="js/tools/xcConfirm.js" type="text/javascript" charset="utf-8"></script>
+        <script src="js/tools/jquery.validate.js"></script>
+        <link rel="stylesheet" href="css/index.css" type="text/css" />
+        <style>
+            .logo{
+                width:40px;
+                height:40px;
+                background: rgb(76, 76, 76) url("images/logo.jpg");
+                background-size: contain;/**背景图片自动缩放*/
+                margin:0 auto ;
+            }
+            /***访客logo栏**/
+            .guestLog{
+                width: 100%;
+                height: 40px;
+                background-color: #000000;
+                font-size: 14px;
+                font-family: "Microsoft YaHei";
+                line-height: 40px;
+            }
+            .guestBox{
+                margin:0 auto;
+                width:600px;
+            }
+            .logoTitle{
+                font-style:italic;
+                letter-spacing: 0;
+                padding-left: 5px;
+                font-size: 24px;
+                color: white;
+                text-align: center;
+                line-height: 40px;
+                text-shadow: 0px 1px 0px #999, 0px 2px 0px #888, 0px 3px 0px #777,
+                0px 4px 0px #666, 0px 5px 0px #555, 0px 6px 0px #444,
+                0px 7px 0px #333, 0px 8px 7px #001135;
+            }
+        </style>
+        <script>
+            /****页面初始化***/
+            function pageIni(){
+                //初始化时设置mainArea宽度
+                adjustSize();
+            }
+            /***调节主显示区域的大小**/
+            function adjustSize(){
+                var winWidth = $(document.body).width();//浏览器时下窗口可视区域高度
+                var winHeight = $(document.body).height();
+                $(".mainArea").width(winWidth-$(".nav-main").width());//减去菜单栏的宽度
+                $(".mainArea").height(winHeight-$(".header").height());//减去标题的高度
+            }
+        </script>
+    </head>
+    <body>
+        <header class="header">
+            <div class="guestLog" >
+                <div class="guestBox">
+                    <table>
+                        <tr>
+                            <td>
+                                <div class="logo"></div>
+                            </td>
+                            <td>
+                                <span class="logoTitle">赤水河中下游防汛决策支持与预警平台</span>
+                            </td>
+                        </tr>
+                    </table>
+                   <!-- <div class="logo"></div>-->
+                  <!--  <image src="images/logo.jpg" style="width:40px;height:40px"></image>-->
+
+                </div>
+            </div>
+        </header>
+        <!-------------------导航菜单栏----------------->
+        <div class="nav-main">
+            <div class="nav-box">
+                <div class="nav">
+                    <ul class="nav-ul">
+                        <li id="home"><a href="javascript:jumpToMainPage();" ><span>首页</span></a></li>
+                        <li id="realTimeNav"><a href="#" ><span>天气实况</span></a></li>
+<!--                         <li id="forecastNav"><a href="#" ><span>天气预报</span></a></li> -->
+                        <li id="historyNav"><a href="#" ><span>历史天气</span></a></li>
+                        <li id="productNav"><a href="#" ><span>气象产品</span></a></li>
+                    </ul>
+                </div>
+                <div class="nav-slide">
+                    <div class="nav-slide-o">
+                    </div>
+                    <div class="nav-slide-o">
+                        <ul class="realTimeMonitor">
+                            <li id="stationProfile"><a href="#"><span>实况概要</span></a></li>
+                            <li id="rainGraph"><a href="#"><span>降水量分布</span></a></li>
+                            <li id="tempGraph"><a href="#"><span>温度分布</span></a></li>
+<!--                             <li id="humiGraph"><a href="#"><span>湿度分布</span></a></li> -->
+                        </ul>
+                    </div>
+<!--                     <div class="nav-slide-o"> -->
+<!--                         <ul class="forecast"> -->
+<!--                             <li id="forecastProfile"><a href="#"><span>天气概要</span></a></li> -->
+<!--                             <li id="forecastRain"><a href="#"><span>降水量分布</span></a></li> -->
+<!--                             <li id="forecastTemp"><a href="#"><span>温度分布</span></a></li> -->
+<!--                         </ul> -->
+<!--                     </div> -->
+                    <div class="nav-slide-o">
+                        <ul class="history">
+                            <li id="historyRain"><a href="#"><span>降水量分布</span></a></li>
+                            <li id="historyTemp"><a href="#"><span>温度分布</span></a></li>
+                        </ul>
+                    </div>
+                    <!-----------游客查看气象产品   包括制作的一些气象产品和发布的预警信息------------>
+                    <div class="nav-slide-o" >
+                        <ul class="product">
+                            <li id="weatherBull"><a href="#"><span>气象快报</span></a></li>
+                            <li id="weatherWarn"><a href="#"><span>气象预警</span></a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!----------------主视图区域，载入时执行页面初始化函数---------------------->
+        <iframe class="mainArea" onLoad="pageIni();">
+        </iframe>
+        <script>
+            /***页面载入后，mainArea显示实况天气**/
+            $(".mainArea").attr("src","html/realTimeMonitor/stationProfile.html");
+            /***每次窗体变化后相应调整主显示区域的宽度**/
+            $(window).resize(function () {
+                adjustSize();//浏览器时下窗口可视区域高度
+            })
+            /***点击首页菜单，主显示区域回到首页**/
+            function jumpToMainPage(){
+                $(".mainArea").attr("src","html/realTimeMonitor/stationProfile.html");
+            }
+            /***菜单切换*/
+            $(function(){
+                //切换延时，增加动画效果
+                var delayTime;
+                $('.nav-ul li').mouseleave(function(even){
+                    delayTime	=	setTimeout(thisMouseOut,1000);
+                })
+                /*****鼠标进入事件*****/
+                $('.nav-ul li').mouseenter(function(){
+                    clearTimeout(delayTime);
+                    var ind	=	$('.nav-ul li').index($(this));
+                    if($.trim($('.nav-slide-o').eq(ind).html()) != ""){
+                        $('.nav-slide').addClass('hover');
+                        $('.nav-slide-o').hide();
+                        $('.nav-slide-o').eq(ind).show();
+                    }
+                    else{
+                        $('.nav-slide').removeClass('hover');
+                    }
+                })
+                /****鼠标移除事件****/
+                function thisMouseOut(){
+                    $('.nav-slide').removeClass('hover');
+                }
+                /***进入一级菜单**/
+                $('.nav-slide').mouseenter(function(){
+                    clearTimeout(delayTime);
+                    $('.nav-slide').addClass('hover');
+                })
+                /***离开一级菜单**/
+                $('.nav-slide').mouseleave(function(){
+                    $('.nav-slide').removeClass('hover');
+                })
+                /***点击二级菜单
+                 * 主显示区域载入相应页面
+                 * 说明：相应子页面的命名和所在文件夹的命名需要符合以下规则：
+                 *   1、子页面的文件名和二级菜单项的id相同
+                 *   2、子页面所在的文件夹名和二级菜单父类ul的类名相同
+                 * **/
+                $('.nav-slide-o li').click(function(){
+                    var itemId=$(this).attr("id");
+                    var itemClass=$(this).parent().attr("class")
+                    var nextPage="html/"+itemClass+"/"+itemId+".html";
+                    $(".mainArea").attr("src",nextPage);
+                })
+            })
+        </script>
+    </body>
+</html>

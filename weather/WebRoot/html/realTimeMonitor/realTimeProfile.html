@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=RpTdu4OtB0FDfzxcUyz33Sapou51zm7G"></script>
+    <script src="../../js/tools/layer/layer.js"></script>
+    <style type="text/css">
+        body, html {
+            width: 100%;
+            height: 100%;
+            margin:0 0;
+            overflow-x: hidden;
+            font-family:"微软雅黑";
+        }
+        #mapArea{
+            width:100%;
+            height:100%;
+        }
+    </style>
+
+</head>
+<body>
+<div id="mapArea"></div>
+<script type="text/javascript">
+        // 百度地图API功能
+        var map = new BMap.Map("mapArea",{minZoom:10,maxZoom:15}); // 创建Map实例,设置地图允许的最小/大级别，级别越大越清晰，越能看到细节
+        map.centerAndZoom(new BMap.Point(105.703927, 28.596676),13); // 少于最小的按设置的最小算
+        map.enableScrollWheelZoom(true); // 设置了最大级别和最小级别之后，滚动的范围也受制于最大与最小，根据实际使用情况进行设置
+        //左上角比例尺控件
+        var scaleControl = new BMap.ScaleControl({ anchor: BMAP_ANCHOR_TOP_LEFT });
+        map.addControl(scaleControl);
+        getBoundary();//画出赤水市的轮廓线
+        /**
+         * 绘制几个镇的标签作为示意
+         * **/
+        var icon = new BMap.Icon('../../images/redMapMarker.png', new BMap.Size(30, 32), {
+            anchor: new BMap.Size(10, 30)
+        });
+        var tianTai={"lng":105.7590,"lat":28.564433,"name":"天台镇","context":"今天：现在多云，温度18℃<br>湿度：70%<br>风速：东北 每秒2米<br>体感温度：20℃<br>降水量：21毫米"};
+        var fuxing={"lng":105.7488960000,"lat":28.5206440000,"name":"复兴镇","context":"今天：现在多云，温度22℃<br>湿度：71%<br>风速：东北 每秒2米<br>体感温度：21℃<br>降水量：1毫米"};
+        var guandu={"lng":106.095139,"lat":28.5549150000,"name":"官渡镇","context":"今天：现在晴间多云，温度24℃<br>湿度：65%<br>风速：东北 每秒2.5米<br>体感温度：22℃<br>降水量：0.8毫米"};
+        var yuanhou={"lng":105.948607,"lat":28.3688910000,"name":"元厚镇","context":"今天：现在晴间多云，温度20℃<br>湿度：65%<br>风速：东北 每秒2.5米<br>体感温度：22℃<br>降水量：0.8毫米"};
+        plotMaker(tianTai);
+        plotMaker(fuxing);
+        plotMaker(guandu);
+        plotMaker(yuanhou);
+        /**绘制标记点**/
+        function plotMaker(point){
+            var mapPoint=new BMap.Point(point.lng,point.lat);
+            var marker = new BMap.Marker(mapPoint,{icon:icon});//新建marker;
+            var pointLabel = new BMap.Label(point.name, { offset: new BMap.Size(20, -10) });
+            pointLabel.setStyle({background:"#3385ff",color :"#ffffff",fontSize : "14px",borderColor:"blue",})
+            marker.setLabel(pointLabel);//绘制标签
+            map.addOverlay(marker);//绘制标记点
+            marker.addEventListener("click", function(){
+                var opts={width:100,height:180,title:point.name};
+                var infoWindow = new BMap.InfoWindow(point.context,opts);
+                infoWindow.setTitle("<h4 style='color:red;margin:0 0 5px 0;padding:0.2em 0'>"+point.name+"</h4>")
+                this.openInfoWindow(infoWindow);
+            });
+          /*  marker.addEventListener("mouseout",function(){
+              this.closeInfoWindow();
+            });*/
+
+        }
+        /**绘制边界**/
+        function getBoundary(){
+            var bdary = new BMap.Boundary();
+            var name ="赤水市";
+            bdary.get(name, function(rs){       //获取行政区域
+                var count = rs.boundaries.length; //行政区域的点有多少个
+                for(var i = 0; i < count; i++){
+                    //建立多边形覆盖物，设置覆盖物为虚线、红色、全透明
+                    var ply = new BMap.Polygon(rs.boundaries[i], {strokeWeight: 2, strokeStyle:"dashed",strokeColor: "#ff0000",fillColor: "none"});
+                    map.addOverlay(ply);  //添加覆盖物
+                    map.setViewport(ply.getPath());    //调整视野
+                }
+            });
+        }
+
+</script>
+</body>
+</html>

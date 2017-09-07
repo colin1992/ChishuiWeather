@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<script type="text/javascript" src="../../js/tools/jquery-1.9.1.min.js"></script>
+<!-- kindEditor文本编辑器 -->
+<link rel="stylesheet" href="../../js/tools/kindeditor/themes/default/default.css" />
+<script charset="utf-8" src="../../js/tools/kindeditor/kindeditor-min.js"></script>
+<script charset="utf-8" src="../../js/tools/kindeditor/lang/zh_CN.js"></script>
+<title>Insert title here</title>
+<style>
+body,html{
+            width:99%;
+            height:99%;
+            min-width: 1350px;
+            min-height: 910px;
+            font-family:"微软雅黑";
+        }
+        .title{
+            height: 8%;
+            min-height:  60px;
+            width: 98%;
+            border: 1px solid #eeeeee;
+            line-height: 70px;
+        }
+        .titleName{
+            margin-left: 5%;
+            font-weight: bold;
+            font-size: 20px;
+        }
+        .kindEditeArea{
+            margin-top: 1%;
+            height: 80%;
+            min-height:  200px;
+            width: 98%;
+            border: 1px solid #eeeeee;
+            line-height: 210px;
+            font-size: 14px;
+        }
+        .backButton{
+            background: #1bf7a3;
+            text-align:center;  /*是文字水平居中*/
+            line-height: 40px;  /*使文字垂直居中*/
+            margin-right:10px;
+            margin-top: 10px;
+            height: 40px;;
+            width:80px;
+            color:white;
+            cursor: pointer;
+        }
+        .backButton:hover {
+	        color: white;
+	        background: #61d37c;
+	    }
+		.paraTable{
+	        font-family: Verdana;
+	        font-size: 13px;
+	    }
+		.labelSpan{
+	        font-family: Verdana;
+	        font-size: 12px;
+	    }
+	    .paraTable tr div{
+	        height:34px;
+	        cursor:default;
+	        margin-top:6px;
+	        margin-bottom:6px;
+	        line-height:38px;
+	        margin-left:5px;
+	        border:1px solid #b9b9b9;
+	    }
+    	.menuBox{
+	        float:right;
+	        background: #1bf7a3;
+	        line-height:40px;
+	        text-align:center;
+	        margin-right:10px;
+	        margin-top:10px;
+	        height:40px;
+	        width:80px;
+	        color:white;
+	        cursor: pointer;
+	    }
+	    .menuBox:hover {
+	        color: white;
+	        background: #61d37c;
+	    }
+	    .productTitle{
+            margin-top: 1%;
+            height: 6%;
+            min-height:  60px;
+            width: 98%;
+            border: 1px solid #eeeeee;
+            line-height: 60px;
+            font-size: 14px;
+        }
+</style>
+</head>
+<body>
+<div class="title">
+   <span class="titleName">
+                   产品编辑
+   </span>
+   <span class ="backButton" style="float: right">
+                   返回
+   </span>
+</div>
+<div class = "productTitle">
+	<span style="margin-left: 5%;margin-bottom:100px">
+         	产品标题 ：
+    </span>
+    <input id = "productTitle" style="width: 250px;height: 20px"/>
+</div>
+<div class = "kindEditeArea">
+	<span style="margin-left: 5%;float:left">产品内容：</span>
+	<textarea name = "content" id="infoText" style="width:700px;height:700px"></textarea>
+</div>
+ <table class="paraTable" style = "margin-left:60px">
+     <tr>
+         <!---用来设置margin--->
+         <td style="width:60px"></td>
+         <td>
+             <div class="menuBox" id="menuConfirm">
+                 <span>修改</span>
+             </div>
+         </td>
+         <td style="width:60px"></td>
+        <td>
+            <div class="menuBox" id="menuExport">
+                <span>导出</span>
+            </div>
+        </td>
+         <td style="width:60px"></td>
+         <td>
+             <div class="menuBox" id="menuCancel">
+                 <span>取消</span>
+             </div>
+         </td>
+     </tr>
+</table>
+</body>
+<script>
+//kindEdite编辑器的基本配置
+var editor;
+KindEditor.ready(function(K) {
+         editor =  K.create('textarea[name="content"]', {
+        			//resizeType : 1,
+        			allowPreviewEmoticons : false,
+        			allowImageUpload : true,
+        			uploadJson : '../../js/tools/kindeditor/jsp/upload_json.jsp',
+    				fileManagerJson : '../../js/tools/kindeditor/jsp/file_manager_json.jsp',
+    				allowFileManager : true,
+    				//readonlyMode : true
+        			/* items : [
+        				'fontname', 'fontsize', '|', 'forecolor', 'hilitecolor', 'bold', 'italic', 'underline',
+        				'removeformat', '|', 'justifyleft', 'justifycenter', 'justifyright', 'insertorderedlist',
+        				'insertunorderedlist', '|', 'emoticons', 'image', 'link'] */
+        		});
+        	});
+//返回按钮的点击事件
+$(".backButton").click(function(){
+	$(window.parent.document).find(".mainArea").attr("src","html/product/productMake.html");
+})
+$("#menuCancel").click(function(){
+	$(window.parent.document).find(".mainArea").attr("src","html/product/productMake.html");
+})
+var model1 = '<h1 style="text-align:center;">'+
+	'实时天气快报'+
+     '</h1>'+
+     '<p>'+
+	'<span style="font-size:16px;">&nbsp; &nbsp; &nbsp; &nbsp; 现在是2017年5月31号15点20分。下面是实时的天气快报信息。</span>'+
+'</p>'+
+'<p>'+
+	'<span style="font-size:16px;">&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-size:16px;">&nbsp; &nbsp; 过去<strong>一小时的平均温度</strong>为 。过去<strong>一小时的最高气温</strong>为 。过去<strong>一小时的最气气温</strong>为 。</span>'+
+'</p>'+
+'<p>'+
+	'<span style="font-size:16px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; 过去<strong>一小时的降雨量</strong>为 。过去<strong>三小时的降雨量</strong>为 。 过去<strong>六小时降雨量</strong>为 。 过去<strong>十二小时降雨量</strong>为 。<br />'+
+'</span>'+
+'</p>'+
+'<p style="text-align:center;">'+
+	'<span style="font-size:16px;"><img src="/weather/attached/image/20170531/20170531152618_488.jpg" alt="" width="500" height="375" title="" align="" /><br />'+
+'</span>'+
+'</p>';
+
+var model2 = '<h1 style="text-align:center;">'+
+	'预警快报'+
+'</h1>'+
+'<p>'+
+	'<span style="font-size:16px;">&nbsp; &nbsp; &nbsp; &nbsp; 现在是2017年5月31号15点20分。下面是预警信息。</span>'+
+'</p>'+
+'<p>'+
+	'<span style="font-size:16px;">&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-size:16px;">&nbsp; &nbsp; 以下监测站, &nbsp;发生了 &nbsp; 类型的预警。请相关部门密切关注。</span>'+
+'</p>'+
+'<p style="text-align:center;">'+
+	'<span style="font-size:16px;"><img src="/weather/attached/image/20170531/20170531152618_488.jpg" alt="" width="500" height="375" title="" align="" /><br />'+
+'</span>'+
+'</p>';
+$("#infoText").val(model1);
+$("#productTitle").val("2017年6月1日14时58分预警快报");
+$("#menuConfirm").click(function(){
+	editor.sync();
+	alert($("#infoText").val());
+	console.log("模板信息:"+$("#infoText").val());
+})
+</script>
+</html>

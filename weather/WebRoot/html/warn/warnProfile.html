@@ -1,0 +1,382 @@
+<!--------灾情快讯界面，以GIS方式呈现包含易受灾地点相关信息和疏散路线等详细信息---------->
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+        <script src="../../js/tools/jquery-1.9.1.min.js" type="text/javascript"></script>     
+        <script src="../../js/baidumap_offline_v2_load.js"></script>
+		<script src="../../js/baidumap_offline_v2_20160822_min.js"></script>
+		<script src="../../js/baidumap_offline_v2_20160822.js"></script>
+		<link rel="stylesheet" type="text/css" href="../../css/baidu_map_v2.css" />     
+        <script src="../../js/index.js" type="text/javascript"></script>
+        <script src="../../js/tools/layer/layer.js"></script>
+        <style type="text/css">
+            body, html {
+                width: 100%;
+                height:100%;
+                margin:0 0;
+                font-family:"微软雅黑";
+            }
+            #mapArea{
+                width:100%;
+                height:100%;
+                margin-top:0px;
+                margin-bottom:10px;
+            }
+            /****易受灾站点详情显示区域***/
+            #vulnerableArea{
+                position:absolute;
+                z-index:20;
+                display: none;
+                width:240px;
+                height:700px;
+                right:10px;
+                top:30px;
+                background-color: rgb(255, 255, 255);
+                border-radius: 2px 2px;;
+                box-shadow: rgba(0, 0, 0, 0.14902) 1px 2px 1px 0px;
+                color: rgb(76, 76, 76);
+                font-family: Arial, Helvetica, SimSun, sans-serif;
+                font-size: 12px;
+            }
+            #vulnerableTitle,#vulnerableDetail{
+                width:240px;
+            }
+            #vulnerableDetail{
+                position: absolute;
+                top:55px;
+                height:650px;
+             }
+            #vulnerableTitle{
+                color: rgb(44, 129, 255);
+                font-size: 13px;
+                height:20px;
+                text-align: center;
+            }
+            .closeBtn{
+                cursor: pointer;
+                height: 45px;
+                line-height: 45px;
+                position: absolute;
+                right: 0px;
+                top: 0px;
+                user-select: none;
+                width: 45px;
+                background-attachment: scroll;
+                background-clip: border-box;
+                background-image:url(../../images/boxImg.png);
+                background-origin: padding-box;
+                background-position: 0px -38px;
+                background-size: auto;
+                z-index:21;
+                box-sizing: border-box;
+                color: rgb(76, 76, 76);
+            }
+            .closeBtn:hover{
+                background-color: rgb(247, 247, 247);
+            }
+            .vulnerableItems tr{
+                height:20px;
+                margin-bottom:5px;
+                text-align:center;
+            }
+            /****详情****/
+            .items{
+
+            }
+            /****详情条目标题**/
+            .itemsTitle{
+                font-weight:bold;
+                text-align:right;
+            }
+
+        </style>
+
+    </head>
+    <body>
+        <div id="mapArea"></div>
+        <!-----易受灾站点详情显示区域------->
+        <div id="vulnerableArea" style="cursor:default;-webkit-user-select:none;user-select:none;">
+            <div id="move" style="height:45px;margin-top:0px;float:left;cursor:pointer" onmousedown="startMove(event,this.parentNode)" onmouseup="stopMove(event)">
+	            <div class="closeBtn" title="关闭">
+	            </div>
+	            <div id="vulnerableTitle" >
+	                <h5>易受灾点详情</h5>
+	            </div>
+	         </div>
+            <div id="vulnerableDetail"></div>
+        </div>
+
+        <script type="text/javascript">
+            /***点击closeBtn**/
+            $(".closeBtn").click(function(){
+                closeVulnerableArea();
+            })
+            /*****
+             * 关闭受灾点详情区域****/
+            function closeVulnerableArea(){
+                /***将详情区域内容清空**/
+                $("#vulnerableDetail").html("");
+                $("#vulnerableArea").css("display","none");
+            }
+            /****查看易受灾站点详情***/
+            function setVulnerableDetail(vulner){
+                if( $("#vulnerableArea").css('display')=="none"){
+                    $("#vulnerableArea").css('display','block');
+                }
+                var context="<div style='font-size:12px;'>"+
+                                    "<table class='vulnerableItems'>"+
+                                            "<tr style=''>"+
+                                                    "<td style='width:15px;'></td>"+
+                                                    "<td class='itemsTitle'>地区名称:</td>"+
+                                                    "<td style='width:5px'></td>" +
+                                                    "<td style='text-align:center;'>"+vulner.name+"</td>"+
+                                            "</tr>"+
+	                                            "<tr style=''>"+
+	                                            "<td style='width:15px;'></td>"+
+	                                            "<td class='itemsTitle'>所属乡镇:</td>"+
+	                                            "<td style='width:5px'></td>" +
+	                                            "<td style='text-align:center;'>"+vulner.cnty+"</td>"+
+                                   			 "</tr>"+
+                                            "<tr>"+
+                                                    "<td style='width:15px;'></td>"+
+                                                    "<td class='itemsTitle'>经纬度:</td>"+
+                                                    "<td style='width:5px'></td>" +
+                                                    "<td style='text-align:center;'>"+vulner.lng+","+vulner.lat+"</td>"+
+                                            "</tr>"+
+                                            "<tr>"+
+                                                    "<td style='width:15px;'></td>"+
+                                                    "<td class='itemsTitle'>易发灾害:</td>"+
+                                                    "<td style='width:5px'></td>" +
+                                                    "<td style='text-align:center;'>"+vulner.type+"</td>"+
+                                            "</tr>"+
+                                            "<tr>"+
+                                                    "<td style='width:15px;'></td>"+
+                                                    "<td class='itemsTitle'>应急联系人:</td>"+
+                                                    "<td style='width:5px'></td>"+
+                                                    "<td style='text-align:center;'>"+vulner.ecpName+"</td>"+
+                                            "</tr>"+
+                                            "<tr>"+
+                                                    "<td style='width:15px;'></td>"+
+                                                    "<td class='itemsTitle'>联系邮箱:</td>"+
+                                                    "<td style='width:5px'></td>"+
+                                                    "<td style='text-align:center;'>"+vulner.ecpEmail+"</td>"+
+                                            "</tr>"+
+                                            "<tr>"+
+                                                    "<td style='width:15px;'></td>"+
+                                                    "<td class='itemsTitle'>联系手机号:</td>"+
+                                                    "<td style='width:5px'></td>"+
+                                                    "<td style='text-align:center;'>"+vulner.ecpPhone+"</td>"+
+                                            "</tr>"+
+                                            "<tr>"+
+                                                    "<td style='width:15px;'></td>"+
+                                                    "<td class='itemsTitle'>常住人口:</td>"+
+                                                    "<td style='width:5px'></td>"+
+                                                    "<td style='text-align:center;'>"+vulner.resPop+"万</td>"+
+                                            "</tr>"+
+                                     "</table>"+
+                                     "<div style='margin-top:5px;overflow:hidden;min-height:30px;'>"+
+	                                     "<div style='float:left;width:60px;margin-left:30px;font-weight:bold;text-align:right;'>"+
+	                                         "<span>疏散路线:</span>"+
+	                                     "</div>"+
+                                     	"<div style='float:right;margin-right:30px;width:110px;'>"+
+                                     		"<p style='text-align:left;padding-top:0px;padding-left:10px;margin-top:0px;'>"+vulner.evaRoute+"</p>"+
+                                     	"</div>"+
+                                     "</div>"+
+                                     "<div style='margin-top:5px;min-height:30px;'>"+
+	                                     "<div style='float:left;width:60px;margin-left:30px;font-weight:bold;text-align:right;'>"+
+	                                         "<span>灾点描述:</span>"+
+	                                     "</div>"+
+	                                 	"<div style='float:right;margin-right:30px;width:110px;'>"+
+	                                 		"<p style='text-align:left;padding-top:0px;padding-left:10px;margin-top:0px;'>"+vulner.description+"</p>"+
+	                                 	"</div>"+
+                                 	"</div>"+
+                                "</div>";
+                    $("#vulnerableDetail").html(context);
+            }
+            /****获取易受灾点详情***/
+            function checkVulnerableDetail(id){
+            	$.ajax({
+	            	dataType:'json',
+	                url:'../../vulner/checkVulnerDetial',
+	                data:{'id':id},
+	                async: false,
+	                success: function(json){
+	                	if(json.statusCode){
+	                    	setVulnerableDetail(json.vulner);
+	                    }
+	                	else{
+	                		layer.alert(json.err, {
+	      	  				  icon: 2,
+	      	  				  skin: 'layer-ext-moon'
+	      	  				})
+	                	}
+	                },
+	                error:function(){
+	
+	                }
+            	})
+            }
+            
+            // 百度地图API功能
+            var map = new BMap.Map("mapArea",{minZoom:8,maxZoom:16}); // 创建Map实例,设置地图允许的最小/大级别，级别越大越清晰，越能看到细节
+            map.centerAndZoom(new BMap.Point(105.703927, 28.596676),13); // 少于最小的按设置的最小算
+            map.enableScrollWheelZoom(true); // 设置了最大级别和最小级别之后，滚动的范围也受制于最大与最小，根据实际使用情况进行设置
+            map.enableScrollWheelZoom(true);
+            var styleJson=[
+                           {
+                               "featureType": "all",
+                               "elementType": "all",
+                               "stylers": {
+                                         "lightness": 10,
+                                         "saturation": -100
+                               }
+                     		}
+            			];
+            map.setMapStyle({
+            	  styleJson:styleJson
+            });
+            //开启鼠标滚轮缩放
+            map.addControl(new BMap.NavigationControl());         //添加缩放按钮
+            //左上角比例尺控件
+            var scaleControl = new BMap.ScaleControl({ anchor: BMAP_ANCHOR_TOP_LEFT });
+            map.addControl(scaleControl);
+            //右下角缩略图控件
+            var overView = new BMap.OverviewMapControl();
+            var overViewOpen = new BMap.OverviewMapControl({ isOpen: true, anchor: BMAP_ANCHOR_BOTTOM_RIGHT });
+            map.addControl(overView);
+            map.addControl(overViewOpen);
+            //画出赤水市的轮廓线
+             getBoundary("赤水市");
+            //定义图标
+            var icon = new BMap.Icon('../../images/redMapMarker.png', new BMap.Size(30, 32), {
+                anchor: new BMap.Size(10, 30)
+            });
+           
+
+            /**
+             * 添加行政区划
+             * @param {} districtName 行政区划名
+             * @returns  无返回值
+             */
+            function getBoundary(districtName) {
+                var blist = [];
+                var boundary="106.02114, 28.339028;106.026086, 28.324636;106.020465, 28.319841;106.005357, 28.317187;"+
+                             "105.999564, 28.321698;105.986822, 28.31046;105.964406, 28.305831;105.942749, 28.31109;"+
+                             "105.937433, 28.298286;105.930583, 28.309265;105.927249, 28.303065;105.929324, 28.296192;"+
+                             "105.914261, 28.29134;105.890127, 28.291155;105.865134, 28.271067;105.850863, 28.272511;"+
+                             "105.825047, 28.311669;105.791968, 28.336201;105.784947, 28.337961;105.755112, 28.309991;"+
+                             "105.746659, 28.279733;105.729799, 28.275108;105.678538, 28.307184;105.654019, 28.312153;"+
+                             "105.646875, 28.319269;105.658733, 28.348453;105.656521, 28.391824;105.642704, 28.407432;"+
+                             "105.645691, 28.417526;105.643936, 28.430618;105.64073, 28.435913;105.62782, 28.44308;"+
+                             "105.626158, 28.450203;105.627658, 28.490617;105.63355, 28.51516;105.643565, 28.527288;"+
+                             "105.668517, 28.535442;105.677182, 28.548921;105.684692, 28.553207;105.694135, 28.571341;"+
+                             "105.700627, 28.597334;105.723221, 28.600285;105.736989, 28.613442;105.746005, 28.617491;"+
+                             "105.762706, 28.601328;105.772944, 28.597387;105.795719, 28.606056;105.821694, 28.598835;"+
+                             "105.853579, 28.599298;105.872681, 28.592786;105.900184, 28.604366;105.908088, 28.618196;"+
+                             "105.897108, 28.662686;105.928353, 28.682881;105.956295, 28.718035;105.97361, 28.754762;"+
+                             "105.979077, 28.757996;105.998565, 28.751728;106.015499, 28.740898;106.024261, 28.730381;"+
+                             "106.028661, 28.711136;106.039983, 28.70031;106.065302, 28.692458;106.087531, 28.680664;"+
+                             "106.118284, 28.634854;106.13137, 28.633144;106.159331, 28.644538;106.169955, 28.642214;"+
+                             "106.17651, 28.63409;106.179611, 28.608901;106.19404, 28.588051;106.203404, 28.582649;"+
+                             "106.232877, 28.576583;106.251547, 28.558952;106.247864, 28.554121;106.248292, 28.539957;"+
+                             "106.237879, 28.527505;106.234458, 28.511667;106.212155, 28.498677;106.211176, 28.492519;"+
+                			 "106.191188, 28.468816;106.193594, 28.456648;106.176736, 28.445228;106.164454, 28.440085;106.157576, 28.441327;"+
+                			 "106.167684, 28.453606;106.157981, 28.458525;106.154802, 28.467954;106.125321, 28.463365;106.100418, 28.465834;"+
+                			 "106.091889, 28.472387;106.072667, 28.475101;106.073147, 28.469483;106.077568, 28.467;"+
+                			 "106.076198, 28.459612;106.087066, 28.451195;106.082767, 28.443679;106.100226, 28.438949;"+
+                			 "106.102581, 28.426046;106.111552, 28.425324;106.118545, 28.416275;106.127589, 28.412501;"+
+                			 "106.124493, 28.399642;106.121785, 28.397661;106.111294, 28.400687;106.095033, 28.393844;"+
+                			 "106.08666, 28.386829;106.089261, 28.375674;106.079219, 28.37665;106.074555, 28.372547;"+
+                			 "106.071979, 28.380978;106.050919, 28.378969;106.039565, 28.370006;106.041723, 28.342095;106.025607, 28.344075;106.02114, 28.339028";
+                blist.push({ points: boundary, name: districtName });
+                drawBoundary(blist);
+            }
+            /***
+             * 绘制显示区域和遮盖层
+             * **/
+            function drawBoundary(blist) {
+                //包含所有区域的点数组
+                var pointArray = [];
+
+                /*画遮蔽层的相关方法
+                 *思路: 首先在中国地图最外画一圈，圈住理论上所有的中国领土，然后再将每个闭合区域合并进来，并全部连到西北角。
+                 *      这样就做出了一个经过多次西北角的闭合多边形*/
+                //定义中国东南西北端点，作为第一层
+                var pNW = { lat: 59.0, lng: 73.0 }
+                var pNE = { lat: 59.0, lng: 136.0 }
+                var pSE = { lat: 3.0, lng: 136.0 }
+                var pSW = { lat: 3.0, lng: 73.0 }
+                //向数组中添加一次闭合多边形，并将西北角再加一次作为之后画闭合区域的起点
+                var pArray = [pNW,pSW,pSE,pNE,pNW];
+                //循环添加各闭合区域
+                for (var i = 0; i < blist.length; i++) {
+                    //需要突出显示的区域
+                    var ply = new BMap.Polygon(blist[i].points,{strokeWeight:2.5,strokeStyle:"dashed",strokeColor:"#ff0000",fillColor:"none"}); //建立多边形覆盖物
+                    map.addOverlay(ply);
+                    //将点增加到视野范围内
+                    var path = ply.getPath();
+                    pointArray = pointArray.concat(path);
+                    //将闭合区域加到遮蔽层上，每次添加完后要再加一次西北角作为下次添加的起点和最后一次的终点
+                    pArray = pArray.concat(path);
+                    pArray.push(pArray[0]);
+                }
+                map.setViewport(pointArray);    //调整视野
+                //添加遮蔽层
+                var plyall = new BMap.Polygon(pArray, { strokeOpacity:0.0005,strokeColor:"#000000",strokeWeight:0.0005,fillColor:"#000000",fillOpacity: 0.6 }); //建立多边形覆盖物
+                map.addOverlay(plyall);
+            }
+            /****获取所有易受灾点****/
+         $.ajax({
+         dataType:'json',
+         url:'../../vulner/getAllVulners',
+         data:{},
+         success: function(json){
+             if(json.statusCode){
+                var vulners=json.vulners;
+                for(var i=0;i<vulners.length;i++){
+                	plotMaker(vulners[i]);
+                }
+             }
+             else{
+            	 layer.alert(json.err, {
+	  				  icon: 2,
+	  				  skin: 'layer-ext-moon'
+	  				})
+             }
+         },
+         error:function(){
+
+         }
+     })
+   /**绘制标记点**/
+     function plotMaker(point){
+                var mapPoint=new BMap.Point(point.lng,point.lat);
+                var marker = new BMap.Marker(mapPoint,{icon:icon});//新建marker;
+                var pointLabel = new BMap.Label(point.name, { offset: new BMap.Size(20, -10) });
+                pointLabel.setStyle({background:"#3385ff",color :"#ffffff",fontSize : "14px",borderColor:"blue",})
+                marker.setLabel(pointLabel);//绘制标签
+                map.addOverlay(marker);//绘制标记点
+                marker.addEventListener("click", function(){
+                    var infoContext="<h4 style='color:red;margin:0 0 5px 0;padding:0.2em 0'>"+point.name+"</h4>"+
+                                    "<div style='font-size:13px;line-height:1.5;margin-bottom: 20px'>"+
+                                         "<p style='margin:0;text-indent:1em'><span style='font-weight:bold;font-size:14px;'>易发灾害:&nbsp;</span>"+point.type+"</p>"+
+                                         "<p style='margin:0;text-indent:1em'><span style='font-weight:bold;font-size:14px;'>常住人口:&nbsp;</span>"+point.resPop+"万</p>"+
+                                         "<p style='margin:0;text-indent:1em'><span style='font-weight:bold;font-size:14px;'>应急联络人:&nbsp;</span>"+point.ecpName+"&nbsp;&nbsp;"+point.ecpPhone+"</p>"+
+                                          "<p style='margin:0;text-indent:1em'><a href='javascript:checkVulnerableDetail("+point.id+")'>查看详情</a></p>"+
+                                    "</div>";
+                    var infoWindow = new BMap.InfoWindow(infoContext);
+                    /****打开信息窗***/
+                    this.openInfoWindow(infoWindow);
+                    /***关闭信息窗时关闭易受灾点详情区域**/
+                    infoWindow.addEventListener("close",function(){
+                        //关闭受灾点详情
+                       closeVulnerableArea();
+                    })
+                });
+            }
+
+        </script>
+   </body>
+</html>

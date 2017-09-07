@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<script src="../../js/tools/jquery-1.9.1.min.js" type="text/javascript"></script>
+	<script src="../../js/tools/layer/layer.js"></script>
+	<script src="../../js/tools/context.js"></script>
+	<script src="../../js/tools/jquery.printArea.js"></script>	
+	<script src="../../js/tools/xlsx.core.min.js"></script>
+	<script src="../../js/tools/Blob.js"></script>
+	<script src="../../js/tools/FileSaver.js"></script>
+	<script src="../../js/tools/tableexport.js"></script>
+	<link rel="stylesheet" type="text/css" href="../../css/context.standalone.css">
+	<link rel="stylesheet" type="text/css" href="../../css/buttons.css">
+	<style>
+		html,body{
+			width:99%;
+			height:99%;
+		}
+		.tableSet{
+			float: left;
+			width: 98%;
+			height:100%;
+			min-height: 500px;
+		}
+		.tableSearch{
+			width:100%;
+			height:10%;
+			line-height: 80px;
+			overflow:hidden;
+		}
+		.printArea{
+			width:100%;
+			height:80%;
+			cursor: default;
+		}
+ 		.tableDetail{
+			width:100%;
+			height:100%;
+			cursor: default;
+		} 
+		.turnPage{
+			width:100%;
+			height:10%;
+			line-height: 80px;/*文本垂直居中*/
+			overflow:hidden;
+			text-align: center;/*文本水平居中*/
+			-moz-user-select: none;
+			-webkit-user-select: none;
+			-ms-user-select: none;
+			-khtml-user-select: none;
+			user-select: none;
+		}
+		body table>tbody>tr>td{
+			text-align: center;
+			border: solid 0px white;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+			overflow: hidden;
+		}
+		.tableSet table>tbody>tr{
+			height: 5%;/* 52px; */
+			background-color: #e4d9ff;
+		}
+		.tableSet table>tbody>tr>td:hover/*选择鼠标指针浮动在其上的元素*/
+		{
+			overflow:visible;/*默认值。内容不会被修剪，会呈现在元素框之外。*/
+		}
+		body table>thead>tr>th{
+			text-align: center;
+			vertical-align: middle;
+			color:white;
+			height: 50px;
+			background-color: #343434;
+		}
+		.tableSearch span{
+			margin-left: 30px;
+		}
+		.tableTrHover {
+			background-color: #a986bf !important;
+			color: #f9f6ff !important;
+		}
+		.btn-toolbar.top {
+			padding: 1px;
+		}
+		
+		.btn.btn-default {
+			width: 100px;
+			padding: 1px;
+		}
+		
+		.btn.btn-default.xlsx {
+			margin-left: 300px;
+		}
+	</style>
+</head>
+<body oncontextmenu=self.event.returnValue=false>
+	<div class="tableSet">
+		<div class="tableSearch">
+			<span>信息标题</span>
+			<input id="infoTitleSearch" type="text"/>
+			<span>信息类别</span>
+			<select id="infoType" style="width:173px;length:21px">
+				<option value="station"> 检测站点</option>
+				<option value="disaster"> 易受灾点</option>
+				<option value="otherInfo">其他信息</option>
+			</select>
+			<button id="search" style="width:50px;height:24px;cursor:pointer;line-height:3px;margin-left:40px">查询</button>
+			<button id="add" style="width:50px;height:24px;cursor:pointer;line-height:3px;margin-left:10px">新增</button>
+			<button id="print" style = "width:50px;height:24px;cursor:pointer;line-height:3px;margin-left:10px">打印</button>
+		    <button id="export" style = "width:50px;height:24px;cursor:pointer;line-height:3px;margin-left:10px">导出</button>
+		</div>
+		<div class="printArea">
+		<table class="tableDetail" id="basisTableDetail">
+			<thead>
+			<tr>
+				<th width="12%">编号</th>
+				<th width="14%">信息标识</th>
+				<th width="14%">信息名称</th>
+				<th width="16%">信息类别</th>
+				<th width="26%">描述</th>
+			</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td></td><td></td><td></td><td></td><td></td>
+				</tr>
+				<tr>
+					<td></td><td></td><td></td><td></td><td></td>
+				</tr>
+				<tr>
+					<td></td><td></td><td></td><td></td><td></td>
+				</tr>
+				<tr>
+					<td></td><td></td><td></td><td></td><td></td>
+				</tr>
+				<tr>
+					<td></td><td></td><td></td><td></td><td></td>
+				</tr>
+				<tr>
+					<td></td><td></td><td></td><td></td><td></td>
+				</tr>
+				<tr>
+					<td></td><td></td><td></td><td></td><td></td>
+				</tr>
+				<tr>
+					<td></td><td></td><td></td><td></td><td></td>
+				</tr>
+				<tr>
+					<td></td><td></td><td></td><td></td><td></td>
+				</tr>
+				<tr>
+					<td></td><td></td><td></td><td></td><td></td>
+				</tr>
+				<tr>
+					<td></td><td></td><td></td><td></td><td></td>
+				</tr>
+				<tr>
+					<td></td><td></td><td></td><td></td><td></td>
+				</tr>
+			</tbody>
+		</table>
+		</div>
+		<div class="turnPage">
+			<button style="cursor: pointer;width:60px;height:25px" id = "firstPage">首页</button>
+			<button style="margin-left: 15px;cursor: pointer;width:60px;height:25px" id = "prePage">上一页</button>
+			<button style="margin-left: 15px;cursor: pointer;width:60px;height:25px" id = "nextPage">下一页</button>
+			<button style="margin-left: 15px;cursor: pointer;width:60px;height:25px" id = "lastPage">末页</button>
+			<input style="margin-left: 15px;width:23px;" id = "choosePage"  onkeyup="(this.v=function(){this.value=this.value.replace(/[^0-9-]+/,'');}).call(this)" onblur="this.v();" ></input>
+			<button style="margin-left: 5px;cursor: pointer;width:60px;height:25px" id = goToThePage>转到</button>
+			<span style="margin-left: 25px">当前页数：</span>
+			<span id="currentPage"></span>
+			<span>/</span>
+			<span id="totalPage"></span>
+		</div>
+	</div>
+<script>
+$(function() {
+	//给页面所有的button加样式
+	$(".tableSearch button").addClass("button button--wayra button--text-medium button--size-m button--round-m");
+	$(".turnPage button").addClass("button button--wayra  button--text-medium button--size-m button--round-l");
+	//本页面的全局变量
+ 	var totalPage = 1;
+ 	var currentPage = 1;
+	if(window.localStorage.getItem('currentPageBasisList')!=null){
+ 		currentPage =  parseInt(window.localStorage.getItem('currentPageBasisList'));
+ 		if(currentPage == null)
+ 			currentPage = 1;
+ 		totalPage = 1;
+ 	}	        	
+            	//初始化当前页数和总页数
+            	$("#currentPage").text(currentPage);
+            	$("#totalPage").text(totalPage);
+            	//从localStorage中获取资源类型，然后填充到页面中
+            	var currentBaseInfoType =  window.localStorage.getItem('currentBaseInfoType');
+            	if(currentBaseInfoType!="null")
+            		$("#infoType").val(currentBaseInfoType);
+            	//载入页面的时候获相应的资源信息，并且填充到表格中。     
+            	var basisInfoType = $("#infoType").val();
+                if(basisInfoType=="station"){
+              	  window.localStorage.setItem('currentBaseInfoType',"station"); 
+              	  getBasisIntoTable("station/getStationsOutline",12,currentPage,"");                 	   
+                }
+                else if(basisInfoType=="disaster"){
+              	  window.localStorage.setItem('currentBaseInfoType',"disaster"); 
+              	  getBasisIntoTable("vulner/getPaginationVulner",12,currentPage,"");             	  
+                }
+                else{
+              	  window.localStorage.setItem('currentBaseInfoType',"otherInfo"); 
+              	  getBasisIntoTable("basis/getPaginationBasis",12,currentPage,"");
+                }
+            	//右键菜单定义,只有当前行有值的时候才执行右键操作
+                context.init({preventDoubleContext: false});//初始化右键插件
+               	   $(".tableDetail").click(function(){
+               		 	var trs = $(".tableDetail tbody tr"); //获取表格中的每一行
+            			for(var i = 0;i<trs.length;i++){ //遍历表格中的每一行
+            			    if(trs[i].getElementsByTagName("td")[0].innerText!=""&&$(trs[i]).hasClass("tableTrHover")){
+            			    	$(trs[i]).addClass("hasContent");
+            			    	$(trs[i]).removeClass("noContent");
+            			    }
+            			    else{
+            			    	$(trs[i]).addClass("noContent");
+            			    	$(trs[i]).removeClass("hasContent");
+            			    }
+            			}
+            			context.attach('.hasContent', [
+            		  		{header: '信息'},
+            		  		{text: "查看详情", action:function(){
+            		  			var trs = $("#basisTableDetail tbody tr"); //获取表格中的每一行
+          		    		    for(var i = 0;i<trs.length;i++){ //遍历表格中的每一行
+          		    		    if(trs[i].classList.contains('tableTrHover')==true){
+          		    		    	//获取对应资源的ID
+          		    		        var infoId = trs[i].getElementsByTagName("td")[1].innerText;
+          		    		        var localstroage = window.localStorage; 
+          		   				 	localstroage.setItem('infoId',infoId); 
+          		   				 	//获取资源的类别
+          		   				 	var infoType = $("#infoType").val();
+          		   				 	localstroage.setItem('infoType',infoType);
+          		   				 	window.localStorage.setItem("currentPageBasisList",currentPage);
+          		   				 	$(window.parent.document).find(".mainArea").attr("src","html/basis/basisInfoView.html"); 
+          		    		    	}
+          						}}},
+            		  		{text: "编辑信息", action:function(){
+            		  			var trs = $("#basisTableDetail tbody tr");
+	                           	for(var i = 0;i<trs.length;i++){
+	                           		 if(trs[i].classList.contains('tableTrHover')==true){
+	                           		 //获取选定资源的ID
+	                           		 var infoId = trs[i].getElementsByTagName("td")[1].innerText;
+	                           		 var localstroage = window.localStorage; 
+	         		   				 	 localstroage.setItem('infoId',infoId); 
+	         		   					 //获取资源的类别
+	         		   				 	 var infoType = $("#infoType").val()
+	         		   				 	 localstroage.setItem('infoType',infoType);
+	         		   				 	 window.localStorage.setItem("currentPageBasisList",currentPage);
+	                           		 }
+	                           	 }
+                           	 	$(window.parent.document).find(".mainArea").attr("src","html/basis/basisInfoEdite.html"); }},
+               		  		{text: "删除信息", action:function(){
+	               		  		 var trs = $("#basisTableDetail tbody tr"); //获取表格中的每一行
+	      		    		     for(var i = 0;i<trs.length;i++){ //遍历表格中的每一行
+	      		    		     if(trs[i].classList.contains('tableTrHover')==true){
+	      		    		    	//获取对应资源的ID
+	      		    		        var infoId = trs[i].getElementsByTagName("td")[1].innerText;
+	      		    		    }
+	      		    		   }
+	               		  		if($("#infoType").val()=="station"){
+		               		  		$.ajax({
+		                           		cache: false,
+		                           		dataType:'json',
+		                           		type: "post",
+		                           		url:"../../station/delStation",
+		                           		traditional:true, 
+		                           		data:{
+		                           			"infoId":infoId
+		                           		},
+		                           		async: false,
+		                           		success: function(json) {
+		                           			if(json.statusCode==true){
+		                           				layer.alert("删除成功!", {
+		          		 		  				  icon: 1,
+		          		 		  				  skin: 'layer-ext-moon'
+		          		 		  				})
+		          		 		  				getBasisIntoTable("station/getStationsOutline",12,1,$("#infoTitleSearch").val())
+		                           			}
+		                           			else{
+		                           				layer.alert(json.err, {
+		              	 		  				  icon: 2,
+		              	 		  				  skin: 'layer-ext-moon'
+		              	 		  				})
+		                           			}
+		                           		},
+		                           		error:function(XMLHttpRequest,Error,F,data){
+		                           			layer.confirm("访问出错了:"+XMLHttpRequest.status+Error, {
+		                  		 	   	    	   icon:2,
+		                  		 	   	    	   btn: ['确定'] //可以无限个按钮
+		                  		 	   	    	  ,btn1: function(index, layero){
+		                  		 		   	    		layer.alert("数据为："+data, {
+		                  		 		  				  icon: 2,
+		                  		 		  				  skin: 'layer-ext-moon'
+		                  		 		  				})
+		                  		 	   	    	  }
+		                  		 	   	    	});
+		                           	 	}
+		                           	});
+	               		  		}
+	               		  		else if($("#infoType").val()=="disaster"){
+		               		  		$.ajax({
+		                           		cache: false,
+		                           		dataType:'json',
+		                           		type: "post",
+		                           		url:"../../vulner/delVulner",
+		                           		traditional:true, 
+		                           		data:{
+		                           			"infoId":infoId
+		                           		},
+		                           		async: false,
+		                           		success: function(json) {
+		                           			if(json.statusCode==true){
+		                           				layer.alert("删除成功!", {
+		          		 		  				  icon: 1,
+		          		 		  				  skin: 'layer-ext-moon'
+		          		 		  				})
+		          		 		  				getBasisIntoTable("vulner/getPaginationVulner",12,1,$("#infoTitleSearch").val())
+		                           			}  
+		                           			else{
+		                           				layer.alert(json.err, {
+		              	 		  				  icon: 2,
+		              	 		  				  skin: 'layer-ext-moon'
+		              	 		  				})
+		                           			}
+		                           		},
+		                           		error:function(XMLHttpRequest,Error,F,data){
+		                           			layer.confirm("访问出错了:"+XMLHttpRequest.status+Error, {
+		                  		 	   	    	   icon:2,
+		                  		 	   	    	   btn: ['确定'] //可以无限个按钮
+		                  		 	   	    	  ,btn1: function(index, layero){
+		                  		 		   	    		layer.alert("数据为："+data, {
+		                  		 		  				  icon: 2,
+		                  		 		  				  skin: 'layer-ext-moon'
+		                  		 		  				})
+		                  		 	   	    	  }
+		                  		 	   	    	});
+		                           	 	}
+		                           	});
+	               		  		}      
+	               		  		else{
+	               		  		$.ajax({
+	                           		cache: false,
+	                           		dataType:'json',
+	                           		type: "post",
+	                           		url:"../../basis/delBasis",
+	                           		traditional:true, 
+	                           		data:{
+	                           			"infoId":infoId
+	                           		},
+	                           		async: false,
+	                           		success: function(json) {
+	                           			if(json.statusCode==true){
+	                           				layer.alert("删除成功!", {
+	          		 		  				  icon: 1,
+	          		 		  				  skin: 'layer-ext-moon'
+	          		 		  				})
+	          		 		  				getBasisIntoTable("basis/getPaginationBasis",12,1,$("#infoTitleSearch").val())
+	                           			}
+	                           			else{
+	                           				layer.alert(json.err, {
+	              	 		  				  icon: 2,
+	              	 		  				  skin: 'layer-ext-moon'
+	              	 		  				})
+	                           			}
+	                           		},
+	                           		error:function(XMLHttpRequest,Error,F,data){
+	                           			layer.confirm("访问出错了:"+XMLHttpRequest.status+Error, {
+	                  		 	   	    	   icon:2,
+	                  		 	   	    	   btn: ['确定'] //可以无限个按钮
+	                  		 	   	    	  ,btn1: function(index, layero){
+	                  		 		   	    		layer.alert("数据为："+data, {
+	                  		 		  				  icon: 2,
+	                  		 		  				  skin: 'layer-ext-moon'
+	                  		 		  				})
+	                  		 	   	    	  }
+	                  		 	   	    	});
+	                           	 	}
+	                           	});
+	               		  		}
+                       	 }},
+            		  	]); 
+               	   })  
+            	//增加基础信息的点击事件
+                $("#add").click(function () {
+                    $(window.parent.document).find(".mainArea").attr("src", "html/basis/addBaseInfo.html");
+                })
+                //鼠标在表格移动选择事件
+				$('table>tbody>tr').click(function(){
+                    $(this).addClass('tableTrHover');
+                    $(this).siblings().removeClass('tableTrHover');
+				})
+				                                          
+              //选择基础信息类别的下拉框来选择载入不同类型的信息
+              $("#infoType").change(function(){
+            	  var basisInfoType = $("#infoType").val();
+                  if(basisInfoType=="station"){
+                	  window.localStorage.setItem('currentBaseInfoType',"station"); 
+                	  getBasisIntoTable("station/getStationsOutline",12,1,$("#infoTitleSearch").val());                 	   
+                  }
+                  else if(basisInfoType=="disaster"){
+                	  window.localStorage.setItem('currentBaseInfoType',"disaster"); 
+                	  getBasisIntoTable("vulner/getPaginationVulner",12,1,$("#infoTitleSearch").val());             	  
+                  }
+                  else{
+                	  window.localStorage.setItem('currentBaseInfoType',"otherInfo"); 
+                	  getBasisIntoTable("basis/getPaginationBasis",12,1,$("#infoTitleSearch").val());
+                  }
+              })  
+              
+    //查询操作
+    $("#search").click(function(){
+    	currentPage = 1;
+    	$("#currentPage").text(currentPage);
+		if($("#infoType").val()=="station")
+			getBasisIntoTable("station/getStationsOutline",12,currentPage,$("#infoTitleSearch").val());
+		else if($("#infoType").val()=="disaster")
+			getBasisIntoTable("vulner/getPaginationVulner",12,currentPage,$("#infoTitleSearch").val());
+		else
+			getBasisIntoTable("basis/getPaginationBasis",12,currentPage,$("#infoTitleSearch").val());
+    })
+    //翻页操作
+    $("#prePage").click(function(){
+    	if(currentPage-1<=totalPage&&currentPage-1>0){
+    		currentPage = currentPage-1;
+    		$("#currentPage").text(currentPage);
+    		if($("#infoType").val()=="station")
+    			getBasisIntoTable("station/getStationsOutline",12,currentPage,$("#infoTitleSearch").val());
+    		else if($("#infoType").val()=="disaster")
+    			getBasisIntoTable("vulner/getPaginationVulner",12,currentPage,$("#infoTitleSearch").val());
+    		else
+    			getBasisIntoTable("basis/getPaginationBasis",12,currentPage,$("#infoTitleSearch").val());
+    	}
+    	else{
+    		layer.alert("已经到了第一页",{icon:7});
+    	}
+    })
+    $("#nextPage").click(function(){
+    	if(currentPage+1<=totalPage&&currentPage+1>0){
+    		currentPage = currentPage+1;
+    		$("#currentPage").text(currentPage);
+    		if($("#infoType").val()=="station")
+    			getBasisIntoTable("station/getStationsOutline",12,currentPage,$("#infoTitleSearch").val());
+    		else if($("#infoType").val()=="disaster")
+    			getBasisIntoTable("vulner/getPaginationVulner",12,currentPage,$("#infoTitleSearch").val());
+    		else
+    			getBasisIntoTable("basis/getPaginationBasis",12,currentPage,$("#infoTitleSearch").val());
+    	}
+    	else
+    		layer.alert("已经到了最后一页",{icon:7});
+    })
+    $("#firstPage").click(function(){
+   		currentPage = 1;
+   		$("#currentPage").text(currentPage);
+   		if($("#infoType").val()=="station")
+			getBasisIntoTable("station/getStationsOutline",12,currentPage,$("#infoTitleSearch").val());
+		else if($("#infoType").val()=="disaster")
+			getBasisIntoTable("vulner/getPaginationVulner",12,currentPage,$("#infoTitleSearch").val());
+		else
+			getBasisIntoTable("basis/getPaginationBasis",12,currentPage,$("#infoTitleSearch").val());
+    })
+    $("#lastPage").click(function(){
+    	currentPage = totalPage;
+   		$("#currentPage").text(currentPage);
+   		if($("#infoType").val()=="station")
+			getBasisIntoTable("station/getStationsOutline",12,currentPage,$("#infoTitleSearch").val());
+		else if($("#infoType").val()=="disaster")
+			getBasisIntoTable("vulner/getPaginationVulner",12,currentPage,$("#infoTitleSearch").val());
+		else
+			getBasisIntoTable("basis/getPaginationBasis",12,currentPage,$("#infoTitleSearch").val());
+    })
+    $("#goToThePage").click(function(){
+    	var currentPageTem = $("#choosePage").val();
+    	if(currentPageTem == "")
+    		layer.alert("页码不能为空",{
+    			icon:2,
+    			skin: 'layer-ext-moon'
+    		})
+    	else if(currentPageTem>totalPage||currentPageTem<1)
+    		layer.alert("请输入有效的页码",{
+    			icon:2,
+    			skin: 'layer-ext-moon'
+    		})
+    	else{
+    		currentPage = parseInt(currentPageTem);
+    		$("#currentPage").text(currentPage);
+    		if($("#infoType").val()=="station")
+    			getBasisIntoTable("station/getStationsOutline",12,currentPage,$("#infoTitleSearch").val());
+    		else if($("#infoType").val()=="disaster")
+    			getBasisIntoTable("vulner/getPaginationVulner",12,currentPage,$("#infoTitleSearch").val());
+    		else
+    			getBasisIntoTable("basis/getPaginationBasis",12,currentPage,$("#infoTitleSearch").val());
+		}
+    }) 
+              
+           /**
+                                  写入表格的操作
+           @tabledata 向表格中写入的数据
+           **/
+        	function tableDataIn(tabledata){
+        		$("#basisTableDetail tbody tr td").html("");
+                var tableData = tabledata;/*tableData为后台需渲染到表格中的所有数据*/
+                var allTr = $("#basisTableDetail tbody tr");//得到所有的行
+                var rowNum = tabledata.length;//得到数据总行数
+                var colNum = $(allTr[0]).children('td').length;//得到总列数 
+                for(var i = 0;i<rowNum;i++){
+        			$(allTr[i]).children('td')[0].innerHTML=i+1;
+        			for(var j = 1;j<colNum;j++){
+        				$(allTr[i]).children('td')[j].innerHTML=tableData[i][j-1];       					
+        			}
+        		}
+            }
+           /**
+                                将基础信息(站点信息，易受灾点)写入到表格中
+           @infoType 基础信息类型
+           @requestUrl 向后台请求的url地址
+           @rowCount 表格的行数
+           @currentPage 请求的页码
+           **/
+             function getBasisIntoTable(requestUrl,rowCount,currentPage11,infoSearch){
+        	   			$.ajax({
+                		cache: false,
+                		dataType:'json',
+                		type: "post",
+                		url:"../../"+requestUrl,
+                		traditional:true, 
+                		data:{
+                			"rowCount":rowCount,
+                			"currentPage":currentPage11,
+                			"infoSearch":infoSearch
+                		},
+                		async: false,
+                		success: function(json) {
+                			var tableData = [];
+                			if(json.statusCode==true){
+                				if($("#infoType").val()=="station"){                 					
+                					var stationData = json.stations;               				
+                    				for(var i =0;i<stationData.length;i++){
+                    					tableData.push([stationData[i].code,stationData[i].name,$("#infoType option:selected").text(),stationData[i].description]);
+                    				}
+                    				tableDataIn(tableData); 
+                				}
+                				else if($("#infoType").val()=="disaster"){
+                					var stationData = json.vulners;               				
+                    				for(var i =0;i<stationData.length;i++){
+                    					tableData.push([stationData[i].id,stationData[i].title,$("#infoType option:selected").text(),stationData[i].description]);
+                    				}
+                    				tableDataIn(tableData);
+                				}
+                				else{
+                					var basis = json.basis;               				
+                    				for(var i =0;i<basis.length;i++){
+                    					tableData.push([basis[i].id,basis[i].title,$("#infoType option:selected").text(),basis[i].description]);
+                    				}
+                    				tableDataIn(tableData);
+                				}
+                				totalPage = json.totalPage;
+                				$("#totalPage").text(totalPage);
+                				currentPage = currentPage11;
+                				$("#currentPage").text(currentPage);
+                			}
+                			else{
+                				tableDataIn(tableData);
+                				totalPage = 1;
+                				$("#totalPage").text(totalPage);
+                				currentPage = 1;
+                				$("#currentPage").text(currentPage);
+                				layer.alert(json.err, {
+      	 		  				  icon: 2,
+      	 		  				  skin: 'layer-ext-moon'
+      	 		  				})
+                			}                				
+                		},
+                		error:function(XMLHttpRequest,Error,F,data){
+                		   layer.confirm("访问出错了:"+XMLHttpRequest.status+Error, {
+  		 	   	    	   icon:2,
+  		 	   	    	   btn: ['确定'] //可以无限个按钮
+  		 	   	    	  ,btn1: function(index, layero){
+  		 		   	    		layer.alert("数据为："+data, {
+  		 		  				  icon: 2,
+  		 		  				  skin: 'layer-ext-moon'
+  		 		  				})
+  		 	   	    	  }
+  		 	   	    	});
+                	 	}
+                	});
+             }
+    /**
+             打印操作
+     **/
+     $("#print").click(function(){
+     	$(".printArea").printArea();
+     })
+     $("#export").click(function() {
+         if($(".btn-toolbar.top")) {
+             $(".btn-toolbar.top").remove();
+         }                
+         $("table").tableExport({
+             headings: true,                     
+             // (Boolean), display table headings (th/td elements) in the <thead>
+             footers: true,                      
+             // (Boolean), display table footers (th/td elements) in the <tfoot>
+             formats: ["xlsx", "xls"],     
+             // (String[]), filetype(s) for the export
+             fileName: "id",                     
+             // (id, String), filename for the downloaded file
+             bootstrap: true,
+             // (Boolean), style buttons using bootstrap
+             position: "top",
+             // (top, bottom), position of the caption element relative to table
+         });
+         $(".btn.btn-default.xlsx").bind("click",function() {
+             $(".btn-toolbar.top").remove();
+         });
+         $(".btn.btn-default.xls").bind("click",function() {
+             $(".btn-toolbar.top").remove();
+         });
+     });  
+})
+</script>
+</body>
+</html>

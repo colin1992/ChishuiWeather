@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script type="text/javascript" src="../../js/tools/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="../../js/tools/dtree.js"></script>
+    <link rel="stylesheet" href="../../css/dtree.css" type="text/css" />
+    <script src="../../js/tools/layer/layer.js"></script>
+    <title>报警策略详情</title>
+    <style>
+        body,html{
+            width:99%;
+            height:99%;
+            min-width: 1350px;
+            min-height: 910px;
+            font-family:"微软雅黑";
+        }
+        .title{
+            height: 8%;
+            min-height:  60px;
+            width: 98%;
+            border: 1px solid #eeeeee;
+            line-height: 70px;
+        }
+        .titleName{
+            margin-left: 5%;
+            font-weight: bold;
+            font-size: 20px;
+        }
+        .warnStrategyName,.warnType,.warnPara,.threshold,.startThreshold,.infoWay{
+            margin-top: 0.5%;
+            height: 6%;
+            min-height:  60px;
+            width: 98%;
+            border: 1px solid #eeeeee;
+            line-height: 60px;
+            font-size: 14px;
+        }
+        .warnStrategyName{
+            margin-top: 1%;
+        }
+        .selectStation{
+            margin-top: 0.5%;
+            /* height: 24%; */
+/*             height:auto!important;  */
+            height:50%;
+            min-width: 1430px;
+            width: 98%;
+            border: 1px solid #eeeeee;
+            font-size: 14px;
+        }
+        .stations{
+            margin-top: 1%;
+            height:80%;
+            width:85%;
+            border: 1px solid #eeeeee;
+            float: left;
+            line-height: 25px;
+        }
+        .stations label{
+            width: 100px;
+            height: 20px;
+            display:inline-block
+        }
+        .selectPerson{
+            margin-top: 0.5%;
+            height: 24%;
+            min-height:  60px;
+            width: 98%;
+            border: 1px solid #eeeeee;
+            line-height: 210px;
+            font-size: 14px;
+        }
+        .persons{
+            margin-top: 1%;
+            height:80%;
+            width:250px;
+            border: 1px solid #eeeeee;
+            float: left;
+            line-height: 25px;
+        }
+        .paraTable tr div{
+            height:34px;
+            cursor:pointer;
+            margin-top:15px;
+            margin-bottom:15px;
+            line-height:38px;
+            margin-left:15px;
+            border:1px solid #b9b9b9;
+        }
+        .menuBox{
+            float:right;
+            background: #1bf7a3;
+            line-height:40px;
+            text-align:center;
+            margin-right:10px;
+            margin-top:10px;
+            height:40px;
+            width:80px;
+            color:white;
+            cursor: pointer;
+        }
+        .backButton{
+            background: #1bf7a3;
+            text-align:center;  /*是文字水平居中*/
+            line-height: 40px;  /*使文字垂直居中*/
+            margin-right:10px;
+            margin-top: 10px;
+            height: 40px;;
+            width:80px;
+            color:white;
+            cursor: pointer;
+        }
+        .menuBox:hover {
+	        color: white;
+	        background: #61d37c;
+	    }
+	    .backButton:hover {
+	        color: white;
+	        background: #61d37c;
+	    }
+    </style>
+</head>
+<body>
+<div class="title">
+        <span class="titleName">
+            报警策略详情
+        </span>
+        <span class ="backButton" style="float: right">
+            返回
+        </span>
+</div>
+<div class="warnStrategyName">
+        <span style="margin-left: 5%">
+            策略标题：
+        </span>
+    <input id="strategyNameInput" style="width: 250px;height: 20px" readonly/>
+</div>
+<div class="warnType">
+        <span style="margin-left: 5%">
+            报警类别：
+        </span>
+    <label><input name="warnType" id = "rainFall" type="radio" value="rainfall" checked="checked" disabled="disabled"/>降水量</label>
+    <label><input name="warnType" id = "tem" type="radio" value="temp" disabled="disabled"/>温度</label>
+</div>
+<div class="warnPara">
+        <span style="margin-left: 5%">
+            报警参数：
+        </span>
+    <label class="rainPara"><input name="rainPara"  type="radio" value="1h" disabled="disabled"/>1小时降水量</label>
+    <label class="rainPara"><input name="rainPara" type="radio" value="3h" disabled="disabled"/>3小时降水量</label>
+    <label class="rainPara"><input name="rainPara" type="radio" value="6h" disabled="disabled"/>6小时降水量</label>
+    <label class="rainPara"><input name="rainPara" type="radio" value="12h" disabled="disabled"/>12小时降水量</label>
+    <label class="rainPara"><input name="rainPara" type="radio" value="24h" disabled="disabled"/>24小时降水量</label>
+    <label class="temPara"><input id = "temSel" name="temPara" type="radio" value="ave" disabled="disabled"/>平均温度</label>
+    <label class="temPara"><input id = "temMaxSel" name="temPara" type="radio" value="high" disabled="disabled"/>最高温度</label>
+    <label class="temPara"><input id = "temMaxSel" name="temPara" type="radio" value="low" disabled="disabled"/>最低温度</label>
+</div>
+<div class = "infoWay">
+	<span style="margin-left: 5%">
+            预警方式：
+    </span>
+    <label><input type="checkbox" id="isSms" name="selectButton" disabled="disabled"/>发送短信</label>
+    <label><input type="checkbox" id="isTel" name="selectButton" disabled="disabled"/>拨打电话</label>
+    <label><input type="checkbox" id="isEmail" name="selectButton" disabled="disabled"/>发送邮件</label>
+</div>
+<div class="threshold">
+        <span style="margin-left: 5%">
+            报警阈值：
+        </span>
+    <input id = "warnThreshold" readonly style="width: 250px;height: 20px"/>
+    <span id="unitRain">
+            (mm)
+        </span>
+    <span id="unitTem">
+            (℃)
+        </span>
+</div>
+<div class="startThreshold">
+        <span style="margin-left: 5%">
+            是否启用：
+        </span>
+    <label><input id = "isStart" type="checkbox" disabled="disabled"/>已启用</label>
+</div>
+<div class="selectStation">
+    <span style="margin-left: 5%;float: left;margin-top: 200px">
+        预警站点：
+    </span>
+        <div class="stations">
+            
+        </div>
+</div>
+<div class="selectPerson" style = "margin-bottom:20px">
+        <span style="margin-left: 5%;float: left">
+            预警人员：
+        </span>
+    <div class="persons" id="tree" style="height:200px;overflow-y:auto">
+    </div>
+</div>
+</body>
+<script>
+    $(function(){
+        tree = new dTree('tree');//创建一个对象.
+        tree.config.folderLinks=true;
+        tree.config.useCookies=false;
+        tree.config.check=true;
+      //从数据库中获取所有的人员信息
+        $.ajax({
+     		cache: false,
+     		dataType:'json',
+     		type: "post",
+     		url:"../../warn/getLiaisonsInfo",
+     		traditional:true, 
+     		data:null,
+     		async: false,
+     		success: function(json) {
+     			if(json.statusCode){
+     				/**根节点**/
+         	        var nodeNameRoot = "预警用户";
+         	        tree.add(0,-1,nodeNameRoot,"","","","","",false);
+         	        /**组别信息**/
+         	        var groupInfo = json.liaisonUnits;
+         	         for(var i =0;i<groupInfo.length;i++){
+         	        	var nodeId = "g_"+groupInfo[i].id;
+         	        	var parentId=0;//读取节点pid
+         	        	var nodeName="<input type='checkbox' class='permCheck' disabled='disabled' value="+parentId+" id='"+nodeId+"' name='peopleGroup' style='width: 15px;height:15px;vertical-align:middle; '>"+groupInfo[i].name;
+         	        	tree.add(nodeId,parentId,nodeName,"","","","","",false);
+         	        } 
+         	        /**人员信息**/
+         	        var memberInfo = json.liaisons;
+         	         for(var i =0;i<memberInfo.length;i++){
+         	        	var nodeId = memberInfo[i].id;
+         	        	var parentId="g_"+memberInfo[i].unitId;//读取节点pid
+         	        	var nodeName="<input type='checkbox' class='permCheck memberPerCheck' disabled='disabled' name='checkboxAuthority' value="+parentId+" id='"+nodeId+"'  style='width: 15px;height:15px;vertical-align:middle; '>"+memberInfo[i].name;
+         	        	tree.add(nodeId,parentId,nodeName,"","","","","",false);
+         	        }
+         	        document.getElementById("tree").innerHTML = tree;
+     			}
+     			else{
+     				layer.alert(json.err, {
+  	  				  icon: 2,
+  	  				  skin: 'layer-ext-moon'
+  	  				})
+     			} 
+     		},
+     		error:function(XMLHttpRequest,Error,F,data){
+     			layer.confirm("访问出错了:"+XMLHttpRequest.status+Error, {
+	 	   	    	   icon:2,
+	 	   	    	   btn: ['确定'] //可以无限个按钮
+	 	   	    	  ,btn1: function(index, layero){
+	 		   	    		layer.alert("数据为："+data, {
+	 		  				  icon: 2,
+	 		  				  skin: 'layer-ext-moon'
+	 		  				})
+	 	   	    	  	}
+	 	   	    	});
+     	 	}
+     	}); 
+       
+		//将数据库中的所有的站点载入到页面上
+         $.ajax({
+   		cache: false,
+   		dataType:'json',
+   		type: "post",
+   		url:"../../warn/getStationInfo",
+   		traditional:true, 
+   		data:null,
+   		async: false,
+   		success: function(json) {
+   			if(json.statusCode){
+   				var stations = json.stations;
+   				var rows = stations.length/10+1;
+       		    for(var i = 0;i<rows;i++){
+       		        $(".stations").append("<div>");
+       		        for(var k =0;k<10;k++){
+       		            if(stations[k+i*10]==undefined)
+       		                break;
+       		            var classContent = "";
+       		            if(stations[k+i*10].areaCode=="520381")
+       		            	classContent="selectAllStations selectChishuiStations";
+       		            else if(stations[k+i*10].areaCode=="520382")
+       		            	classContent="selectAllStations selectRenhuaiStations";
+       		            else if(stations[k+i*10].areaCode=="520330")
+       		            	classContent="selectAllStations selectXishuiStations";
+       		         $(".stations").append("<label><input "+"class='"+classContent+"' name='allStations' value='"+stations[k+i*10].code+"' "+"type='checkbox' disabled='disabled'/>"+stations[k+i*10].name+"</label>");
+       		        }
+       		        $(".stations").append("</div>");
+       		     }
+       		 
+   			}
+   			else{
+   				layer.alert(json.err, {
+	  				  icon: 2,
+	  				  skin: 'layer-ext-moon'
+	  				})
+   			}
+   		},
+   		error:function(XMLHttpRequest,Error,F,data){
+   			layer.confirm("访问出错了:"+XMLHttpRequest.status+Error, {
+ 	   	    	   icon:2,
+ 	   	    	   btn: ['确定'] //可以无限个按钮
+ 	   	    	  ,btn1: function(index, layero){
+ 		   	    		layer.alert("数据为："+data, {
+ 		  				  icon: 2,
+ 		  				  skin: 'layer-ext-moon'
+ 		  				})
+ 	   	    	  }
+ 	   	    	});
+   	 	}
+   	});
+
+        $(".permCheck").on("click",function(){
+            var value=this.id;
+            var allChildren = $("input[value='"+value+"']");
+            for(var i =0;i<allChildren.length;i++){
+                allChildren[i].checked = this.checked;
+            }
+        })
+        
+      //从数据库中读取信息填充到对应的位置
+      var localstroage = window.localStorage; 
+      var strategyId = localstroage.getItem('strategyId'); 
+      $.ajax({
+       		cache: false,
+       		dataType:'json',
+       		type: "post",
+       		url:"../../warn/getWarnStrategyDetial",
+       		traditional:true, 
+       		data:{
+       			"id":strategyId
+       		},
+       		async: false,
+       		success: function(json) {
+       			if(json.statusCode){
+       				//下面开始向相应位置填充相应的数据
+       				var warnStrategy = json.warnStrategy;
+       				//预警策略名字
+       				document.getElementById("strategyNameInput").value = warnStrategy.name;
+       				//预警类型
+       				var warnType = warnStrategy.item;
+       				var value = warnStrategy.param;
+       				if(warnType=="temp"){
+       		        	$(".rainPara").hide();
+       		            $(".temPara").show();
+       		            $("#unitRain").hide();
+       		            $("#unitTem").show();
+       		            $("#tem").attr("checked",true);
+       		            $("#tem").attr("disabled",true);
+       		            //$("#temSel").attr("checked",true);
+       		         $("input:radio[name=temPara][value="+value+"]").attr("checked",'checked');
+       		        }
+       		        else{
+       		        	$(".rainPara").show();
+       		            $(".temPara").hide();
+       		            $("#unitRain").show();
+       		            $("#unitTem").hide();
+       		            //$("#rainFall").attr("checked",true);
+       		            $("#rainFall").attr("disabled",true);
+       		         $("input:radio[name=rainPara][value="+value+"]").attr("checked",'checked');
+       		        }       				
+       				//阈值
+					$("#warnThreshold").val(warnStrategy.threshold);
+					//是否开启
+					if(warnStrategy.status=="已启用")
+						$("#isStart").attr("checked","checked");
+					//预警方式
+					var warnWayRev = warnStrategy.infoWay;
+					if(warnWayRev[0]=="1")
+						$("#isSms").attr("checked","checked");
+					if(warnWayRev[1]=="1")
+						$("#isTel").attr("checked","checked");
+					if(warnWayRev[2]=="1")
+						$("#isEmail").attr("checked","checked");
+       				//站点
+       				var stations = warnStrategy.stations;
+       				for(var i =0;i<stations.length;i++){
+       					$("input:checkbox[name=allStations][value="+stations[i]+"]").attr("checked",'checked');
+       				}
+       				//人员
+       				var peoples = warnStrategy.liaisons;
+       				for(var i = 0;i<peoples.length;i++){
+       					$("input:checkbox[name=checkboxAuthority][id="+peoples[i]+"]").attr("checked",'checked');
+       				}
+       				var beforePeople = $('input:checkbox[name = checkboxAuthority]:checked');
+       				for(var i =0;i<beforePeople.length;i++){
+       					$("input:checkbox[name=peopleGroup][id="+$(beforePeople[i]).val()+"]").attr("checked",'checked');
+       				}
+       			}
+       			else{
+       				layer.alert(json.err, {
+  	  				  icon: 2,
+  	  				  skin: 'layer-ext-moon'
+  	  				})
+       			}
+       		},
+       		error:function(XMLHttpRequest,Error,F,data){
+       			layer.confirm("访问出错了:"+XMLHttpRequest.status+Error, {
+	 	   	    	   icon:2,
+	 	   	    	   btn: ['确定'] //可以无限个按钮
+	 	   	    	  ,btn1: function(index, layero){
+	 		   	    		layer.alert("数据为："+data, {
+	 		  				  icon: 2,
+	 		  				  skin: 'layer-ext-moon'
+	 		  				})
+	 	   	    	  }
+	 	   	    	});
+       	 	}
+       	});
+    });
+    $(".backButton").click(function(){
+        $(window.parent.document).find(".mainArea").attr("src","html/warn/warnStrategy.html");
+    })
+</script>
+</html>

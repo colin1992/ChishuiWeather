@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>新增产品类型</title>
+    <script src="../../js/tools/jquery-1.9.1.min.js" type="text/javascript"></script>
+</head>
+<body>
+    <form>
+        <fieldset style="margin-right: 20px;margin-bottom: 30px;height: 300px;width: 400px">
+            <legend><b><i><font size="10" >新增产品类型</font></i></b></legend>
+            <div id="addProduct" style="margin-top: 20px;margin-left: 20px">
+                <div>
+                    <span>类型名称</span>
+                    <input id='productName' type="text"/>
+                </div>
+                <div style="margin-top: 20px">
+                    <span>类别描述</span>
+                    <input id="typeDescription" type="text"/>
+                </div>
+                <div style="margin-top: 20px">
+                    <span>操作人员</span>
+                    <input id='operator' type="text"/>
+                </div>
+                <div style="margin-top: 40px">
+                    <span style="cursor:pointer;margin-left: 20px; ">保存</span>
+                    <span id ="back" style="cursor:pointer;margin-left: 20px;">返回</span>
+                </div>
+            </div>
+        </fieldset>
+    </form>
+    <script>
+        $(function(){
+            $("#back").click(function(){
+                $(window.parent.document).find(".mainArea").attr("src","html/product/productType.html");
+            })
+        })
+    </script>
+</body>
+</html>

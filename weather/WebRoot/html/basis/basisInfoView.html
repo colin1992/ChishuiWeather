@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="height=device-height, initial-scale=1">
+    <meta charset="UTF-8">
+    <script type="text/javascript" src="../../js/tools/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="../../js/tools/laydate.dev.js"></script>
+	<script src="../../js/tools/layer/layer.js"></script>
+    <!-- kindEditor文本编辑器 -->
+    <link rel="stylesheet" href="../../js/tools/kindeditor/themes/default/default.css" />
+	<script charset="utf-8" src="../../js/tools/kindeditor/kindeditor-min.js"></script>
+	<script charset="utf-8" src="../../js/tools/kindeditor/lang/zh_CN.js"></script>
+</head>
+<style>
+    html,body{
+        width: 100%;
+        height:110%;
+        min-width: 800px;
+        font-family:"微软雅黑";
+    }
+    body{
+        overflow-x:hidden;
+    }
+    /**标题区域**/
+    .graphTitleBox{
+        margin-top:5px;
+        margin-left:10px;
+        margin-right:1%;
+        border:1px solid #eeeeee;
+        width:99%;
+        height:60px;
+    }
+    /***标题显示
+    左对齐、垂直居中
+    ***/
+    .titleContext{
+        float:left;
+        line-height:60px;
+        text-align:left;
+        padding-left:20px;
+        font-size: 16px;
+        font-weight: bolder;
+        color: #666666;
+        letter-spacing: 2px;
+    }
+    /**操作菜单区域**/
+    .menuBox{
+        float:right;
+        background: #1bf7a3;
+        line-height:40px;
+        text-align:center;
+        margin-right:10px;
+        margin-top:10px;
+        height:40px;
+        width:80px;
+        color:white;
+        cursor: pointer;
+    }
+    .menuBox:hover {
+        color: white;
+        background: #61d37c;
+    }
+    /***内容填充区**/
+    .contextArea{
+        margin-top:10px;
+        margin-left:10px;
+        margin-right:1%;
+        border:1px solid #eeeeee;
+        width:99%;
+    }
+    /****参数选择**/
+    .infoParaArea{
+        width:100%;
+        height:50px;
+        line-height:50px;
+        border:1px solid #eeeeee;
+    }
+
+    /***radio box选择区域**/
+    .paraTable{
+        font-family: Verdana;
+        font-size: 13px;
+    }
+    .labelSpan{
+        font-family: Verdana;
+        font-size: 12px;
+    }
+    .paraTable tr div{
+        height:34px;
+        cursor:default;
+        margin-top:6px;
+        margin-bottom:6px;
+        line-height:38px;
+        margin-left:5px;
+        border:1px solid #b9b9b9;
+    }
+    .infoTypeDiv{
+        border:none !important;
+    }
+    .infoTypeDiv  input{
+        width:13px;
+        height:13px;
+    }
+    #menuSet{
+        background: #f72114;
+    }
+    #menuSet:hover{
+        background: #c5070c;
+    }
+    .addVStaion{
+        display:none;
+    }
+    .otherInfo{
+        display:none;
+    }
+</style>
+<script>
+var editor;
+    $(document).ready(function(){
+    	//kindEdite编辑器的基本配置
+    	KindEditor.ready(function(K) {
+                 editor =  K.create('textarea[name="content"]', {
+                			//resizeType : 1,
+                			allowPreviewEmoticons : false,
+                			allowImageUpload : true,
+                			uploadJson : '../../js/tools/kindeditor/jsp/upload_json.jsp',
+            				fileManagerJson : '../../js/tools/kindeditor/jsp/file_manager_json.jsp',
+            				allowFileManager : true,
+            				readonlyMode : true
+                			/* items : [
+                				'fontname', 'fontsize', '|', 'forecolor', 'hilitecolor', 'bold', 'italic', 'underline',
+                				'removeformat', '|', 'justifyleft', 'justifycenter', 'justifyright', 'insertorderedlist',
+                				'insertunorderedlist', '|', 'emoticons', 'image', 'link'] */
+                		});
+                	});
+    	//从localstorage中读取相应的类型，然后把相应的页面呈现出来
+    	var localstroage = window.localStorage;
+        var value=localstroage.getItem('infoType');
+        $("input[name=infoType][value=" + value + "]").attr("checked",true);
+        switch(value){
+            case "station":
+                $(".addMStaion").css("display","block");
+                $(".otherInfo").css("display","none");
+                $(".addVStaion").css("display","none");
+                $(".kindEditeArea").hide();
+                break;
+            case "disaster":
+                $(".addVStaion").css("display","block");
+                $(".otherInfo").css("display","none");
+                $(".addMStaion").css("display","none");
+                $(".kindEditeArea").hide();
+                break;
+            default:
+                $(".otherInfo").css("display","block");
+                $(".addMStaion").css("display","none");
+                $(".addVStaion").css("display","none");
+                $(".kindEditeArea").show();
+                break;
+        }
+        var infoId = localstroage.getItem('infoId');
+        //开始查询数据库来填充到页面的相应位置
+        if(value =="station"){
+        	$.ajax({
+           		cache: false,
+           		dataType:'json',
+           		type: "post",
+           		url:"../../station/checkStationDetial",
+           		traditional:true, 
+           		data:{
+           			"infoCode":infoId
+           		},
+           		async: false,
+           		success: function(json) {
+           			if(json.statusCode==true){
+           				var stationData = json.station;               				
+           				$("#staName").val(stationData.name); 
+           				$("#areaCode").append("<option value='"+stationData.areaName+"'>"+stationData.areaName+"</option>");       				
+           				$("#staCountry").append("<option value='"+stationData.cnty+"'>"+stationData.cnty+"</option>");
+           				$("#staCode").val(stationData.code);
+           				$("#staType").val(stationData.type);
+           				$("#staLng").val(stationData.lng);
+           				$("#staLat").val(stationData.lat);
+           				$("#staDesc").val(stationData.description);
+           			}               				
+           			else
+           				layer.alert(json.err, {
+	 		  				  icon: 2,
+	 		  				  skin: 'layer-ext-moon'
+	 		  				})
+           		},
+           		error:function(XMLHttpRequest,Error,F,data){
+	           	     layer.alert("访问出错了:"+XMLHttpRequest.status+Error+"\n"
+	           	    		 +"数据为："+data, {
+		  				  icon: 2,
+		  				  skin: 'layer-ext-moon'
+		  				})
+           	 	}
+           	});
+        }  
+        else if(value == "disaster"){
+        	$.ajax({
+           		cache: false,
+           		dataType:'json',
+           		type: "post",
+           		url:"../../vulner/getAllVulners",
+           		traditional:true, 
+           		data:{
+           			"infoCode":infoId
+           		},
+           		async: false,
+           		success: function(json) {
+           			if(json.statusCode==true){
+           				var vulners = json.vulners;
+           				for(var i =0;i<vulners.length;i++){
+           					if(vulners[i].id ==infoId){
+           						$("#vName").val(vulners[i].name);
+           						$("#vType").append("<option value='"+vulners[i].type+"'>"+vulners[i].type+"</option>");
+           						$("#vPosition").val(vulners[i].cnty);
+           						$("#vLat").val(vulners[i].lat);
+           						$("#vLng").val(vulners[i].lng);
+           						$("#vPeopleNum").val(vulners[i].resPop);
+           						$("#vECP").val(vulners[i].ecpName);
+           						$("#vECPPhone").val(vulners[i].ecpPhone);
+           						$("#vECPEmail").val(vulners[i].ecpEmail);
+           						$("#vEsLine").val(vulners[i].evaRoute);
+           						$("#vECPDes").val(vulners[i].description);
+           						break;
+           					}
+           				}
+           			}               				
+           			else
+           				layer.alert(json.err, {
+	 		  				  icon: 2,
+	 		  				  skin: 'layer-ext-moon'
+	 		  				})
+           		},
+           		error:function(XMLHttpRequest,Error,F,data){
+           			layer.alert("访问出错了:"+XMLHttpRequest.status+Error+"\n"
+	           	    		 +"数据为："+data, {
+		  				  icon: 2,
+		  				  skin: 'layer-ext-moon'
+		  				})
+           	 	}
+           	});
+        }
+        else{
+        	$.ajax({
+           		cache: false,
+           		dataType:'json',
+           		type: "post",
+           		url:"../../basis/getBasisDetial",
+           		traditional:true, 
+           		data:{
+           			"infoCode":infoId
+           		},
+           		async: false,
+           		success: function(json) {
+           			 if(json.statusCode==true){
+           				var basis = json.basis;
+           				$("#infoTitle").val(basis.title);
+           				$("#infoText").val(basis.context);
+           				$("#otherInfoDec").val(basis.description);
+           			}
+           			else
+           				layer.alert(json.err, {
+	 		  				  icon: 2,
+	 		  				  skin: 'layer-ext-moon'
+	 		  				})
+           		},
+           		error:function(XMLHttpRequest,Error,F,data){
+           	     layer.alert("访问出错了:"+XMLHttpRequest.status+Error+"\n"+
+           	    		"数据为："+data, {
+	  				  icon: 2,
+	  				  skin: 'layer-ext-moon'
+	  				})
+           	 	}
+           	});
+        }
+    });
+</script>
+<body>
+<header>
+    <div class="graphTitleBox">
+        <div class="titleContext">基础信息详情</div>
+        <div class="menuBox">
+            <span id ="back">返回</span>
+        </div>
+    </div>
+</header>
+<!-----内容填充区---->
+<div class="contextArea">
+    <div class="infoParaArea">
+        <table class="paraTable">
+            <tr>
+                <!---用来设置margin--->
+                <td style="width:60px"></td>
+                <td style="width:60px;">
+                    <span class="labelSpan">
+                        信息类型:
+                    </span>
+                </td>
+                <td style="width:330px;">
+                    <div class="infoTypeDiv">
+                        <input type="radio"  name="infoType" value="station" disabled="disabled"></input><span>监测站点</span>
+                        <input type="radio"  name="infoType" value="disaster" disabled="disabled"></input><span>易受灾点</span>
+                        <input type="radio"  name="infoType" value="otherInfo" disabled="disabled"></input><span>其他基信</span>
+                    </div>
+                </td>
+            </tr>
+        </table>
+        <table class="paraTable addMStaion">
+            <tr>
+                <td style="width:60px"></td>
+                <td style="width:60px;">
+                    <span class="labelSpan">
+                        站点名称:
+                    </span>
+                </td>
+                <td style="width:180px;">
+                    <input id="staName" style="width:180px;" readonly>
+                </td>
+            </tr>
+            <tr>
+                <td style="width:60px"></td>
+                <td style="width:80px;">
+                    <span class="labelSpan">
+                       所在地区:
+                    </span>
+                </td>
+                <td style="width:180px;">
+                    <select id="areaCode" style="width:180px;" disabled="disabled">
+                    </select>
+                </td>
+            </tr>
+                        <tr>
+                <td style="width:60px"></td>
+                <td style="width:60px;">
+                    <span class="labelSpan">
+                        所属乡镇:
+                    </span>
+                </td>
+                <td style="width:180px;">
+                    <select id="staCountry" style="width:180px;" disabled="disabled">
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td style="width:60px"></td>
+                <td style="width:80px;">
+                    <span class="labelSpan">
+                       监测站编号:
+                    </span>
+
+                </td>
+                <td style="width:180px;">
+                    <input id="staCode" style="width:180px;" readonly>
+                </td>
+            </tr>
+            <tr>
+                <td style="width:60px"></td>
+                <td style="width:80px;">
+                    <span class="labelSpan">
+                       监测站类型:
+                    </span>
+
+                </td>
+                <td style="width:180px;">
+                    <select id="staType" style="width:180px;" disabled="disabled">
+                    	<option value="rain">雨量</option>
+                    	<option value="tem">温度</option>
+                    	<option value="mix">混合</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td style="width:60px">
+                <td style="width:60px;">
+                    <span class="labelSpan">
+                        经度:
+                    </span>
+                </td>
+                <td style="width:180px;">
+                    <input id="staLng" style="width:180px;" readonly>
+                </td>
+            </tr>
+            <tr>
+                <td style="width:60px">
+                <td style="width:60px;">
+                    <span class="labelSpan">
+                        纬度:
+                    </span>
+                </td>
+                <td style="width:180px;">
+                    <input id="staLat" style="width:180px;" readonly>
+                </td>
+            </tr>
+        </table>
+        <!----------易受灾点------------>
+        <table class="paraTable addVStaion">
+            <tr>
+                <td style="width:60px"></td>
+                <td style="width:60px;">
+                  <span class="labelSpan">
+                      灾点名称:
+                  </span>
+                </td>
+                <td style="width:180px;">
+                    <input id="vName" style="width:180px;" readonly>
+                </td>
+            </tr>
+            <tr>
+                <td style="width:60px"></td>
+                <td style="width:60px;">
+                    <span class="labelSpan">
+                        受灾类型:
+                    </span>
+                </td>
+                <td style="width:180px;">
+                    <select id="vType" style="width:180px;" disabled="disabled">
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td style="width:60px"></td>
+                <td style="width:60px;">
+                    <span class="labelSpan">
+                        乡镇:
+                    </span>
+                </td>
+                <td style="width:180px;">
+                    <input id="vPosition" style="width:180px;" readonly>
+                </td>
+            </tr>
+            <tr>
+                <td style="width:60px"></td>
+                <td style="width:60px;">
+                    <span class="labelSpan">
+                        纬度:
+                    </span>
+                </td>
+                <td style="width:180px;">
+                    <input id="vLat" style="width:180px;" readonly>
+                </td>
+            </tr>
+            <tr>
+                <td style="width:60px"></td>
+                <td style="width:60px;">
+                    <span class="labelSpan">
+                        经度:
+                    </span>
+                </td>
+                <td style="width:180px;">
+                    <input id="vLng" style="width:180px;" readonly>
+                </td>
+            </tr>
+            <tr>
+                <td style="width:60px"></td>
+                <td style="width:60px;">
+                    <span class="labelSpan">
+                        常驻人口:
+                    </span>
+                </td>
+                <td style="width:180px;">
+                    <input id="vPeopleNum" style="width:180px;" readonly>
+                </td>
+            </tr>
+           <tr>
+                <td style="width:60px"></td>
+                <td style="width:60px;">
+                    <span class="labelSpan">
+                        联系人:
+                    </span>
+                </td>
+                <td style="width:180px;">
+                    <input id="vECP" style="width:180px;" readonly>
+                </td>
+                <td style="width:20px"></td>
+                <td style="width:42px;">
+                    <span class="labelSpan">
+                        手机号:
+                    </span>
+                </td>
+                <td style="width:160px;">
+                    <input id="vECPPhone" style="width:160px;" readonly>
+                </td>
+                <td style="width:20px"></td>
+                <td style="width:30px;">
+                    <span class="labelSpan">
+                        邮箱:
+                    </span>
+                </td>
+                <td style="width:160px;">
+                    <input id="vECPEmail" style="width:160px;" readonly>
+                </td>
+            </tr>
+            <tr>
+            	<td style="width:60px"></td>
+                <td style="width:30px;">
+                    <span class="labelSpan">
+                        描述:
+                    </span>
+                </td>
+                <td style="width:180px;">
+                    <textArea id="vECPDes" style="width:180px;height:100px;"></textArea>
+                </td>
+            </tr>
+         </table>
+         <table class="paraTable otherInfo">
+            <!------------其他------------------>
+            <tr class="otherInfo" style="display:none">
+                <!---用来设置margin--->
+                <td style="width:60px"></td>
+                <td style="width:60px;">
+                    <span class="labelSpan">
+                        信息标题:
+                    </span>
+                </td>
+                <td style="width:330px;">
+                    <input id="infoTitle" style="width:100%;height:30px" readonly>
+                </td>
+            </tr>
+            <tr class="otherInfo" style="display:none">
+                <!---用来设置margin--->
+                <td style="width:60px"></td>
+                <td style="width:60px;">
+                    <span class="labelSpan">
+                        信息描述:
+                    </span>
+                </td>
+                <td style="width:330px;">
+                    <textarea id="otherInfoDec" style="width:100%;height:90px" readonly></textarea>
+                </td>
+            </tr>
+        </table>
+        <!-- 其他信息的文本编辑器 -->
+        <div class = "kindEditeArea" style="margin-left:50px">
+        	<span style="padding-left:20px;font-size: 12px;float:left">信息内容：</span>
+        	<textarea name = "content" id="infoText" style="width:700px;height:700px" readonly></textarea>
+		</div>
+
+        <div class="addMStaion">
+              <span style="width:60px;padding-left:65px;font-size: 12px;float:left">站点描述：</span>
+              <textarea id="staDesc" style="resize: none;width:180px;height:230px;margin-left:30px" readonly></textarea>
+        </div>
+        <div class="addVStaion">
+            <span style="width:60px;padding-left:65px;font-size: 12px;float:left">疏散线路：</span>
+            <textarea id="vEsLine" style="resize: none;width:180px;height:230px;" readonly></textarea>
+        </div>
+    </div>
+</div>
+<script>
+	//返回按钮
+	$("#back").click(function(){
+		$(window.parent.document).find(".mainArea").attr("src","html/basis/basisList.html");
+	})
+	//取消按钮
+	$("#menuCancel").click(function(){
+		$(window.parent.document).find(".mainArea").attr("src","html/basis/basisList.html");
+	})
+</script>
+</body>
+</html>

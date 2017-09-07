@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<script type="text/javascript" src="../../js/tools/jquery-1.9.1.min.js"></script>
+ <script src="../../js/tools/xcConfirm.js" type="text/javascript" charset="utf-8"></script>
+ <link rel="stylesheet" href="../../css/xcConfirm.css" type="text/css" />
+<title>邮件配置</title>
+<style>
+		body,html{
+            width:99%;
+            height:99%;
+            min-width: 1350px;
+            min-height: 910px;
+            font-family:"微软雅黑";
+        }
+        .title{
+            height: 8%;
+            min-height:  60px;
+            width: 98%;
+            border: 1px solid #eeeeee;
+            line-height: 70px;
+        }
+        .titleName{
+            margin-left: 5%;
+            font-weight: bold;
+            font-size: 20px;
+        }
+        .emailName{
+            margin-top: 1%;
+            height: 6%;
+            min-height:  60px;
+            width: 98%;
+            border: 1px solid #eeeeee;
+            line-height: 60px;
+            font-size: 14px;
+        }
+        .paraTable tr div{
+            height:34px;
+            cursor:pointer;
+            margin-top:15px;
+            margin-bottom:15px;
+            line-height:38px;
+            margin-left:15px;
+            border:1px solid #b9b9b9;
+        }
+        .menuBox{
+            float:right;
+            background: #1bf7a3;
+            line-height:40px;
+            text-align:center;
+            margin-right:10px;
+            margin-top:10px;
+            height:40px;
+            width:80px;
+            color:white;
+            -webkit-user-select:none;
+		    user-select:none;
+		    cursor:pointer;
+        }
+        .menuBox:hover {
+	        color: white;
+	        background: #61d37c;
+	    }
+	    .emailLabel {
+	       margin-left: 5%;
+	       margin-bottom:100px;
+	       display:-moz-inline-box; 
+		   display:inline-block; 
+	       width:120px;
+	       text-align:right;
+	       -webkit-user-select:none;
+		   user-select:none;
+		   cursor:default;
+	    }
+	    input{
+	       width: 250px;
+	       height: 20px;
+	    }
+	    #settingTd,#checkTd,.pword{
+	    	display:none;
+	    }
+	    .err{
+	       color:red;
+	       margin-left:15px;
+	    }
+</style>
+</head>
+<body>
+<div class="title">
+    <span class="titleName">
+    	 邮箱配置
+    </span>
+    <div class="menuBox">
+        <span id ="back">返回</span>
+   </div>
+</div>
+<div style="margin-top:20px;">
+	<span class="emailLabel">
+               服务器地址：
+    </span>
+    <input id = "address" class="emailInput" readonly="readonly"/>  <span class="err" id="addressErr"></span>
+</div>
+<div>
+	<span class="emailLabel">
+              服务器端口 ：
+    </span>
+    <input id="port" class="emailInput" readonly="readonly"/>  <span class="err" id="portErr"></span>
+</div>
+<div >
+	<span class ="emailLabel">
+               邮箱账号：
+    </span>
+    <input id = "account" class="emailInput" readonly="readonly" type="email"/><span class="err" id="accountErr"></span>
+</div>
+<div class="pword">
+	<span class="emailLabel ">
+               邮箱密码：
+    </span>
+    <input id = "pword" type="password"/><span class="err" id="pwordErr"></span>
+</div>
+<div class="pword" >
+	<span class="emailLabel">
+                确认密码：
+    </span>
+    <input id = "checkPword"  type="password"/>  <span class="err" id="checkPwordErr"></span>
+</div>
+<table class="paraTable" style ="margin-left:60px">
+    <tr>
+        <!---用来设置margin--->
+        <td style="width:60px"></td>
+        <td id="modifyTd">
+        	<div class="menuBox" id="menuModify" style="width:110px">
+                <span>配置服务器</span>
+          	</div>
+        </td>
+         <td id="checkTd">
+        	<div class="menuBox" id="menuCheck">
+                <span>测试</span>
+          	</div>
+        </td>
+        <td style="width:60px"></td>
+        <td id="settingTd">
+            <div class="menuBox" id="menuSetting">
+                <span>配置</span>
+            </div>
+        </td>
+    </tr>
+</table>
+<script>
+//从数据库中读取当前的邮箱地址
+$(document).ready(function(){
+	getEmailServer();
+})
+$("#emailName").val("931385512@qq.com");
+/**
+ * 修改按钮点击事件
+ */
+$("#menuModify").click(function(){
+		$(".pword").css("display","block");
+		$("#settingTd").css("display","block");
+		$("#checkTd").css("display","block");
+		$("#modifyTd").css("display","none");
+		$(".emailInput").removeAttr("readonly");
+
+})
+/****获取当前邮件服务器信息**/
+function getEmailServer(){
+	 $.ajax({
+			cache: false,
+			dataType:'json',
+			type: "post",
+			url:"../../configure/emailServer/getServer",
+			data:{
+			},
+			async: false,
+			success: function(json) {
+				var txt="";
+				if(json.statusCode){//登录成功
+					 var emailServer=json.emailServer;
+					 $("#address").val(emailServer.address);
+					 $("#port").val(emailServer.port);
+					 $("#account").val(emailServer.account);
+				}else{
+					  txt="当前尚未为系统配置邮件服务器，您可以点击\"配置服务器\"键设定邮件服务器信息。";
+					  var option = {
+								title: "提示",
+								btn: parseInt("0001",2),
+								onOk: function(){//点击确认的执行方法
+
+								}
+							}
+				         window.wxc.xcConfirm(txt, "info", option);
+		  		}
+			},
+			error:function(XMLHttpRequest,Error){
+		  		var txt="获取邮件服务器信息失败，";
+		  		txt+="失败原因：";
+		  		if(XMLHttpRequest.status==401){
+		  			 txt+="您不具有当前操作的权限。";
+		  		}
+		  		else if(XMLHttpRequest.status==0){
+		  			txt+="等待超时，请稍后重试。";
+		  		}
+		  		else{
+		  			    txt+="网络错误，";
+		  			    txt+="状态码："+XMLHttpRequest.status;
+		  	    }
+		  	    var option={
+		  			    	   	title: "提示",
+		  			    	   	btn: parseInt("0001",2),
+		  			    	   	onOk: function(){//点击确认的执行方法
+		  			    	   						
+		  			    	  	}
+		  		}
+		  	   window.wxc.xcConfirm(txt, "info", option);
+		  }
+		});
+}
+/****验证输入信息**/
+function validateForm(){
+	console.log("validateForm");
+     if($("#address").val().length<1){
+    	 console.log("服务器地址不能为空");
+    	 $("#addressErr").text("服务器地址不能为空");
+		 return false;
+	 }else{
+		 $("#addressErr").text("");
+	 }
+     if($("#port").val().length<1){
+    	 $("#portErr").text("服务器端口不能为空");
+		 return false;
+	 }
+     else{
+		 $("#portErr").text("");
+	 }
+     var intRegx=/^[0-9]*[1-9][0-9]*$/;
+     if(!intRegx.test($("#port").val())){
+    	 $("#portErr").text("服务器端口非法，请输入正整数");
+		 return false;
+	 }
+     else{
+		 $("#portErr").text("");
+	 }
+     var emailReg= /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+/;
+     if(!emailReg.test($("#account").val())){
+    	 $("#accountErr").text("邮箱地址无效，请输入合法的邮箱地址。");
+		 return false;
+	 }
+     else{
+		 $("#accountErr").text("");
+	 }
+     if($("#pword").val().length<1){
+    	 $("#pwordErr").text("账户密码不能为空");
+		 return false;
+	 }
+     else{
+		 $("#pwordErr").text("");
+	 }
+	 if($("#pword").val()!=$("#checkPword").val()){
+		 $("#checkPwordErr").text("两次密码不一致");
+		 return false;
+	 }
+	 else{
+		 $("#checkPwordErr").text("");
+	 }
+	 return true;
+}
+/***测试邮件服务器可用性***/
+ $("#menuCheck").click(function(){
+	 if(validateForm()){
+		 $.ajax({
+				cache: false,
+				dataType:'json',
+				type: "post",
+				url:"../../configure/emailServer/checkServer",
+				data:{
+					"address":$("#address").val(),
+					"port":$("#port").val(),
+					"account":$("#account").val(),
+					"pword":$("#pword").val()
+				},
+				async: false,
+				success: function(json) {
+					var txt="";
+					if(json.statusCode){//成功
+						  txt="当前邮件服务器可用，您可以点击\"配置\"键下发配置当前设定。";
+					}else{//失败
+						  txt=json.err;
+			  		}
+					var option = {
+	  						title: "提示",
+	  						btn: parseInt("0001",2),
+	  						onOk: function(){//点击确认的执行方法
+
+	  						}
+	  					}
+	  		         window.wxc.xcConfirm(txt, "info", option);
+				},
+				error:function(XMLHttpRequest,Error){
+			  		var txt="测试失败，";
+			  		txt+="失败原因：";
+			  		if(XMLHttpRequest.status==401){
+			  			 txt+="您不具有当前操作的权限。";
+			  		}
+			  		else if(XMLHttpRequest.status==0){
+			  			txt+="等待超时，请稍后重试。";
+			  		}
+			  		else{
+			  			    txt+="网络错误，";
+			  			    txt+="状态码："+XMLHttpRequest.status;
+			  	    }
+			  	    var option={
+			  			    	   	title: "提示",
+			  			    	   	btn: parseInt("0001",2),
+			  			    	   	onOk: function(){//点击确认的执行方法
+			  			    	   						
+			  			    	  	}
+			  		}
+			  	   window.wxc.xcConfirm(txt, "info", option);
+			  }
+			});
+	 }
+ })
+ /***设置邮件服务器**/
+ $("#menuSetting").click(function(){
+	 if(validateForm()){
+		 $.ajax({
+				cache: false,
+				dataType:'json',
+				type: "post",
+				url:"../../configure/emailServer/setServer",
+				data:{
+					"address":$("#address").val(),
+					"port":$("#port").val(),
+					"account":$("#account").val(),
+					"pword":$("#pword").val()
+				},
+				async: false,
+				success: function(json) {
+					var txt="";
+					if(json.statusCode){//成功
+						  txt="您已成功配置邮件服务器。";
+						  var option = {
+			  						title: "提示",
+			  						btn: parseInt("0001",2),
+			  						onOk: function(){//点击确认的执行方法
+			  						  $(".mainArea",parent.document).attr("src","html/systemConfig/emailConfig.html");//刷新页面
+			  						},
+			  						onClose:function(){
+				  						  $(".mainArea",parent.document).attr("src","html/systemConfig/emailConfig.html");//刷新页面
+			  						}
+			  					}
+			  		         window.wxc.xcConfirm(txt, "info", option);
+
+					}else{//失败
+						  txt=json.err;
+						  var option = {
+			  						title: "提示",
+			  						btn: parseInt("0001",2),
+			  						onOk: function(){//点击确认的执行方法
+			  							 
+			  						}
+			  					}
+			  		         window.wxc.xcConfirm(txt, "info", option);
+			  		}
+					
+				},
+				error:function(XMLHttpRequest,Error){
+			  		var txt="设置失败，";
+			  		txt+="失败原因：";
+			  		if(XMLHttpRequest.status==401){
+			  			 txt+="您不具有当前操作的权限。";
+			  		}
+			  		else if(XMLHttpRequest.status==0){
+			  			txt+="等待超时，请稍后重试。";
+			  		}
+			  		else{
+			  			    txt+="网络错误，";
+			  			    txt+="状态码："+XMLHttpRequest.status;
+			  	    }
+			  	    var option={
+			  			    	   	title: "提示",
+			  			    	   	btn: parseInt("0001",2),
+			  			    	   	onOk: function(){//点击确认的执行方法
+			  			    	   						
+			  			    	  	}
+			  		}
+			  	   window.wxc.xcConfirm(txt, "info", option);
+			  }
+			});
+	 }
+ })
+</script>
+</body>
+</html>

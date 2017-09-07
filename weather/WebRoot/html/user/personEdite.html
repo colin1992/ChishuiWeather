@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script type="text/javascript" src="../../js/tools/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="../../js/tools/dtree.js"></script>
+    <script src="../../js/tools/xcConfirm.js" type="javascript" charset="utf-8"></script>
+    <link rel="stylesheet" href="../../css/dtree.css" type="text/css" />
+    <script src="../../js/tools/layer/layer.js"></script>
+    <title>编辑人员</title>
+    <style>
+        body,html{
+            width:99%;
+            height:99%;
+            min-width: 1350px;
+            min-height: 910px;
+            font-family:"微软雅黑";
+        }
+        .title{
+            height: 8%;
+            min-height:  60px;
+            width: 98%;
+            border: 1px solid #eeeeee;
+            line-height: 70px;
+        }
+        .titleName{
+            margin-left: 5%;
+            font-weight: bold;
+            font-size: 20px;
+        }
+        .personRoleName,.personPhone,.personName,.personEmail{
+            margin-top: 1%;
+            height: 6%;
+            min-height:  60px;
+            width: 98%;
+            border: 1px solid #eeeeee;
+            line-height: 60px;
+            font-size: 14px;
+        }
+		.personDec{
+            margin-top: 1%;
+            height: 25%;
+            min-height:  200px;
+            width: 98%;
+            border: 1px solid #eeeeee;
+            line-height: 210px;
+            font-size: 14px;
+        }
+
+        .paraTable tr div{
+            height:34px;
+            cursor:pointer;
+            margin-top:15px;
+            margin-bottom:15px;
+            line-height:38px;
+            margin-left:15px;
+            border:1px solid #b9b9b9;
+        }
+        .menuBox{
+            float:right;
+            background: #1bf7a3;
+            line-height:40px;
+            text-align:center;
+            margin-right:10px;
+            margin-top:10px;
+            height:40px;
+            width:80px;
+            color:white;
+            cursor: pointer;
+        }
+        .menuBox:hover {
+	        color: white;
+	        background: #61d37c;
+	    }
+      <!-- 表单验证 -->
+     .high{ color: red; }
+     .msg{ font-size: 13px; }
+     .onError{ color: red; }
+     .onSuccess{ color: green; }
+    </style>
+</head>
+<body>
+<div class="title">
+        <span class="titleName">
+            编辑人员
+        </span>
+</div>
+<div class="personRoleName">
+        <span style="margin-left: 5%;margin-bottom:100px">
+          人员组别 ：
+        </span>
+    <select id ="groupSelect" style= "width:150px">
+    </select>
+</div>
+<div class = "personName">
+	<span style="margin-left: 5%;margin-bottom:100px">
+         	人员名称 ：
+    </span>
+    <input id = "personName" style="width: 250px;height: 20px" readonly/>
+</div>
+<div class = "personPhone">
+	<span style="margin-left: 5%;margin-bottom:100px">
+         	电话号码 ：
+    </span>
+    <input id = "phone" class="required" style="width: 250px;height: 20px" type="number"/>
+</div>
+<div class = "personEmail">
+	<span style="margin-left: 5%;margin-bottom:100px">
+         	电子邮件：
+    </span>
+    <input id = "email" class="required" style="width: 250px;height: 20px"/>
+</div>
+<div class="personDec">
+        <span style="margin-left: 5%;;float: left">人员备注：</span>
+        <textarea id="description" style="resize: none;width:250px;height:200px;margin-top:10px"></textarea>
+</div>
+<table class="paraTable" style ="margin-left:60px">
+    <tr>
+        <!---用来设置margin--->
+        <td style="width:60px"></td>
+        <td>
+            <div class="menuBox" id="menuConfirm">
+                <span>修改</span>
+            </div>
+        </td>
+        <td style="width:60px"></td>
+        <td>
+            <div class="menuBox" id="menuCancel">
+                <span>取消</span>
+            </div>
+        </td>
+    </tr>
+</table>
+</body>
+<script> 
+//将所有的人员组别的信息提取出来
+$.ajax({
+	cache: false,
+	dataType:'json',
+	type: "post",
+	url:"../../liaison/getUnitInfo",
+	data:null,
+	async: false,
+	success: function(json) {
+	if(json.statusCode){
+		var units = json.units;
+		for(var i =0;i<units.length;i++)
+			$("#groupSelect").append("<option value='"+units[i].id+"'>"+units[i].name+"</option>");
+		}
+	else{
+		layer.alert(json.err, {
+			  icon: 2,
+			  skin: 'layer-ext-moon'
+			})
+		}
+	},
+	error:function(XMLHttpRequest,Error,F,data){
+		layer.confirm("访问出错了:"+XMLHttpRequest.status+Error, {
+	   	   icon:2,
+	   	   btn: ['确定'] //可以无限个按钮
+	   	  ,btn1: function(index, layero){
+	 	    		layer.alert("数据为："+data, {
+					  icon: 2,
+					  skin: 'layer-ext-moon'
+					})
+	   	  }
+	   	});
+		}
+	});
+//通过id将当前的用户的信息提取出来
+var localstroage = window.localStorage;
+var personId = localstroage.getItem('personId');
+var name = localstroage.getItem('name');
+var groupName = localstroage.getItem('groupName');
+var phone = localstroage.getItem('phone');
+var email = localstroage.getItem('email');
+var description = localstroage.getItem('description');
+$("#personName").val(name);
+$("#phone").val(phone);
+$("#email").val(email);
+$("#description").val(description);
+var allOptions = $("#groupSelect option");
+for(var i = 0;i<allOptions.length;i++){
+	if($(allOptions[i]).text()==groupName){
+		$(allOptions[i]).attr("selected","selected");
+	}
+}
+//增加按钮的点击事件
+$("#menuConfirm").click(function(){
+	$(".required").trigger("blur");
+	if($(".onError").length!=0)
+		return false;
+	var localstroage = window.localStorage;
+	var personId = localstroage.getItem('personId');
+	$.ajax({
+		cache: false,
+		dataType:'json',
+		type: "post",
+		url:"../../liaison/alterLiaison",
+		data:{
+			"personId":personId,
+			"groupId":$("#groupSelect").val(),
+			"name":$("#personName").val(),
+			"phone":$("#phone").val(),
+			"email":$("#email").val(),
+			"description":$("#description").val()
+		},
+		async: false,
+		success: function(json) {
+		if(json.statusCode){
+			layer.confirm("修改人员信息成功！", {
+	   	    	   icon:1,
+	   	    	   btn: ['确定'] //可以无限个按钮
+	   	    	  ,btn1: function(index, layero){
+	   	    			$(window.parent.document).find(".mainArea").attr("src","html/user/person.html");
+	   	    	  }
+	   	    	});
+			}
+		else{
+			layer.alert(json.err, {
+				  icon: 2,
+				  skin: 'layer-ext-moon'
+				})
+			}
+		},
+		error:function(XMLHttpRequest,Error,F,data){
+			layer.confirm("访问出错了:"+XMLHttpRequest.status+Error, {
+		   	   icon:2,
+		   	   btn: ['确定'] //可以无限个按钮
+		   	  ,btn1: function(index, layero){
+		 	    		layer.alert("数据为："+data, {
+						  icon: 2,
+						  skin: 'layer-ext-moon'
+						})
+		   	  }
+		   	});
+			}
+		});
+})
+//取消按钮的点击事件
+$("#menuCancel").click(function(){
+	$(window.parent.document).find(".mainArea").attr("src","html/user/person.html");
+})
+
+//****表单验证*****//
+      $(".required").each(function(){
+            //创建元素
+            var $required = $("<strong class='high'>*</strong>");
+            //将它追加到文档中
+            $(this).parent().append($required);
+        });
+      $(".required").blur(function(){
+          //注意：这里的this是DOM对象，$(this)才是jQuery对象
+          var $parent = $(this).parent();
+          //删除之前的错误提醒信息
+          $parent.find(".msg").remove();
+          //验证预警策略名称
+          if($(this).is("#personName")){
+              //运用jQuery中的$.trim()方法，去掉首位空格
+              if($.trim(this.value) == ""){// || $.trim(this.value).length < 6
+                  var errorMsg = " 人员名称不能为空！";
+                  //class='msg onError' 中间的空格是层叠样式的格式
+                  $parent.append("<span class='msg onError'>" + errorMsg + "</span>"); 
+              }
+              else{
+                  var okMsg=" 输入正确";
+                  $parent.find(".high").remove();
+                  $parent.append("<span class='msg onSuccess'>" + okMsg + "</span>");
+              }
+          }
+          if($(this).is("#phone")){
+              //运用jQuery中的$.trim()方法，去掉首位空格
+              if($.trim(this.value) == ""){// || $.trim(this.value).length < 6
+                  var errorMsg = " 人员电话不能为空！";
+                  //class='msg onError' 中间的空格是层叠样式的格式
+                  $parent.append("<span class='msg onError'>" + errorMsg + "</span>"); 
+              }
+              else{
+                  var okMsg=" 输入正确";
+                  $parent.find(".high").remove();
+                  $parent.append("<span class='msg onSuccess'>" + okMsg + "</span>");
+              }
+          }
+          if($(this).is("#email")){
+              //运用jQuery中的$.trim()方法，去掉首位空格
+              var reg = /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+((\.[a-zA-Z0-9_-]{2,3}){1,2})$/;
+              if($.trim(this.value) == ""){// || $.trim(this.value).length < 6
+                  var errorMsg = "电子邮箱不能为空！";
+                  //class='msg onError' 中间的空格是层叠样式的格式
+                  $parent.append("<span class='msg onError'>" + errorMsg + "</span>"); 
+              }
+              else if(!reg.test($("#email").val())){
+                  var errorMsg = "电子邮箱格式不正确！";
+                  //class='msg onError' 中间的空格是层叠样式的格式
+                  $parent.append("<span class='msg onError'>" + errorMsg + "</span>"); 
+              }
+              else{
+                  var okMsg=" 输入正确";
+                  $parent.find(".high").remove();
+                  $parent.append("<span class='msg onSuccess'>" + okMsg + "</span>");
+              }
+          }
+      }).keyup(function(){
+          //triggerHandler 防止事件执行完后，浏览器自动为标签获得焦点
+          $(this).triggerHandler("blur");
+      }).focus(function(){
+          $(this).triggerHandler("blur");
+      });
+</script>
+</html>

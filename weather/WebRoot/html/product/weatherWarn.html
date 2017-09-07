@@ -1,0 +1,181 @@
+<!-------------游客查看预警信息
+主界面显示当前最新的一条预警信息，在相关资讯处列出最近发布的3~4条预警信息
+------------------->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        html body{
+            width:100%;
+            height:100%;
+        }
+        .rightContent{
+            font-family: "Microsoft Yahei", Tahoma, SimSun;
+            font-size: 14px;
+            font-stretch: normal;
+            font-style: normal;
+            font-variant-caps: normal;
+            font-variant-ligatures: normal;
+            font-variant-numeric: normal;
+            font-weight: normal;
+            line-height: normal;
+            margin:0px 0px;
+            width:100%;
+            padding-bottom: 23px;
+            padding-left: 0px;
+            padding-right: 8px;
+            padding-top: 23px;
+        }
+        .graphic{
+            line-height: normal;
+            background-color: rgb(239, 242, 244);
+            margin:0 auto;
+            padding:0px 0px;
+            min-width: 800px;
+            width: 80%;
+        }
+        .title{
+            text-align: center;
+        }
+        .title span{
+            font-size: 24px;
+            color: rgb(37, 37, 37);
+        }
+        .pageContent p{
+            text-indent:2em;
+        }
+        .relativeProd{
+            margin-left: 10%;
+            font-size: 16px;
+            margin-bottom: 30px;
+            height:230px;
+        }
+        .prodHref{
+            border:solid 0px rgb(0, 0, 0);
+            border-image-outset: 0px;
+            border-image-repeat: stretch;
+            border-image-slice: 100%;
+            border-image-width: 1;
+            float: left;
+            font-family: "Microsoft Yahei", Tahoma, SimSun;
+            font-size: 12px;
+            font-stretch: normal;
+            height: 170px;
+            line-height: normal;
+            margin: 0px 0px;
+            margin-bottom: 30px;
+            padding: 0px 0px;
+            width: 250px;
+        }
+        .prodInfo{
+            text-align: center;
+        }
+        .prodInfo a{
+            text-decoration:none;
+            color: rgb(0, 0, 238);
+        }
+        .prodInfo a:hover{
+            color: rgb(85, 26, 139);
+        }
+    </style>
+</head>
+<body>
+<!-- 右边内容部分 start -->
+<div class="rightContent">
+
+    <!-- 文字展示 start-->
+    <div class="graphic">
+        <div class="title">
+            <span>
+                02月27日：赤水市大风黄色预警
+            </span>
+            <p>2017-02-27 08:00:00
+            </p>
+            <hr style="border:1px solid rgb(7, 109, 168);">
+        </div>
+        <div class="pageContent">
+            <p style="">一、预警详情</p>
+            <p style="text-indent:2em;">
+                02-27日8时0分，赤水市气象局发布大风蓝色预警信号如下：预计未来6小时内赤水所辖各县市区可能受大风影响，平均风力可达6级，阵风7~8级，容易造成广告牌临时搭建物吹落、塑料大棚轻质屋顶破损、小型水面船只倾覆和引发各类火灾等危害，请注意防范。
+            </p>
+            <p >二、预防措施</p>
+            <p style="text-indent:2em;">
+                1.政府及相关部门按照职责做好防大风工作；
+            </p>
+            <p style="text-indent:2em;">
+                2.关好门窗，加固围板、棚架、广告牌等易被风吹动的搭建物，妥善安置易受大风影响的室外物品，遮盖建筑物资；
+            </p>
+            <p style="text-indent:2em;">
+                3.相关水域水上作业和过往船舶采取积极的应对措施，如回港避风或者绕道航行等；
+            </p>
+            <p style="text-indent:2em;">
+                4.行人注意尽量少骑自行车，刮风时不要在广告牌、临时搭建物等下面逗留；
+            </p>
+            <p style="text-indent:2em;">
+                5.有关部门和单位注意森林、草原等防火。
+            </p>
+            <hr style="border:1px solid rgba(18,18,18,0.94);">
+            <p style="text-indent:2em;">
+                呈：市  委：市委办信息科
+            </p>
+            <p style="text-indent:4em;">
+                市政府：市政府办、市应急办
+            </p>
+            <p style="text-indent:4em;">
+                市人大：市人大办公室
+            </p>
+            <p style="text-indent:4em;">
+                市政协：市政协办公室
+            </p>
+            <p style="text-indent:4em;">
+                赤水市人武部
+            </p>
+            <p style="text-indent:2em;">
+                送：市园区管委会、市农牧局、安监局、市水利局（防汛办）、市林业局（森防办）、市民政局、
+                市国土局、市教育局、市交通局、市交警大队、市消防大队、市武警中队
+            </p>
+            <hr style="border:1px solid rgba(18,18,18,0.94);">
+            <p style="text-indent:2em;">
+                制作：张东平&nbsp;&nbsp;&nbsp;&nbsp;签发：陈宇
+            </p>
+        </div>
+    </div><!-- 文字展示 end-->
+    <!-- 相关资讯 start -->
+    <div class="relativeProd">
+        <p style="color:rgb(37, 37, 37);font-size: 16px;">相关资讯</p>
+        <div class="prodHref">
+            <div class="prodImg">
+                <a href="http://www.weather.com.cn/index/zxqxgg1/new_wlshtyb.shtml">
+                    <img width="246" height="195" src="../../images/products/zdqDefault.jpg">
+                </a>
+            </div>
+            <div class="prodInfo">
+                <a href="http://www.weather.com.cn/index/zxqxgg1/new_wlshtyb.shtml">寒潮蓝色预警</a>
+            </div>
+        </div>
+        <div class="prodHref">
+            <div class="prodImg">
+                <a href="http://products.weather.com.cn/product/Index/index/procode/JC_HY_RDQXJC.shtml">
+                    <img width="246" height="195" src="../../images/products/tfDefault.jpg">
+                </a>
+            </div>
+            <div class="prodInfo">
+                <a href="http://products.weather.com.cn/product/Index/index/procode/JC_HY_RDQXJC.shtml">大风黄色预警</a>
+            </div>
+        </div>
+        <div class="prodHref">
+            <div class="prodImg">
+                <a href="http://www.weather.com.cn/index/zxqxgg1/qdltqyb.shtml">
+                    <img width="246" height="195" src="../../images/products/qdlDefault.jpg">
+                </a>
+            </div>
+            <div class="prodInfo">
+                <a href="http://www.weather.com.cn/index/zxqxgg1/qdltqyb.shtml">大雾蓝色预警</a>
+            </div>
+        </div>
+    </div><!-- 相关资讯 end -->
+</div>
+<!-- 右边内容部分 end -->
+</body>
+</html>

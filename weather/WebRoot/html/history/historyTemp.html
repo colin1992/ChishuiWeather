@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="height=device-height, initial-scale=1">
+    <meta charset="UTF-8">
+    <script type="text/javascript" src="../../js/tools/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="../../js/tools/laydate.dev.js"></script>
+    <script src="../../js/tools/xcConfirm.js" type="text/javascript" charset="utf-8"></script>
+    <link rel="stylesheet" href="../../css/xcConfirm.css" type="text/css" />
+</head>
+<style>
+    html,body{
+        width: 100%;
+        height:110%;
+        font-family:"微软雅黑";
+    }
+    /**标题区域**/
+    .graphTitleBox{
+        margin-top:20px;
+        margin-left:10px;
+        margin-right:1%;
+        border:1px solid #eeeeee;
+        width:99%;
+        height:60px;
+    }
+    /***标题显示
+    左对齐、垂直居中
+    ***/
+    .titleContext{
+        float:left;
+        line-height:60px;
+        text-align:left;
+        padding-left:20px;
+        font-size: 16px;
+        font-weight: bolder;
+        color: #666666;
+        letter-spacing: 2px;
+    }
+    /**操作菜单区域**/
+    .menuBox{
+        float:right;
+        background: #1bf7a3;
+        line-height:40px;
+        text-align:center;
+        margin-right:10px;
+        margin-top:10px;
+        height:40px;
+        width:80px;
+        color:white;
+        cursor: pointer;
+    }
+    .menuBox:hover {
+        color: white;
+        background: #61d37c;
+    }
+    /***内容填充区**/
+    .contextArea{
+        margin-top:10px;
+        margin-left:10px;
+        margin-right:1%;
+        border:1px solid #eeeeee;
+        width:99%;
+    }
+    /****图表参数选择**/
+     .graphArea{
+        margin-left:65px;
+        margin-top:20px;
+        width:1290px;
+        height:850px;
+        border:1px solid #b9b9b9;
+    }
+    #graphTitle{
+        font-family: Verdana;
+        font-size: 12px;
+        font-stretch: normal;
+        font-style: normal;
+        font-variant: normal;
+        font-weight: normal;
+        height:30px;
+        margin-top:10px;
+        line-height:30px;
+    }
+    /****图表显示区***/
+    .graphArea{
+        margin-left:65px;
+        margin-top:20px;
+    }
+    /***日历框**/
+    .dateArea{
+        width:215px;
+    }
+    #start,#end {
+        width:100%;
+        height:30px;
+        line-height:30px;
+        margin-top:10px;
+        cursor:pointer;
+        padding-left:5px;
+    }
+    /***radio box选择区域**/
+    .paraTable{
+        font-family: Verdana;
+        font-size: 13px;
+    }
+    .labelSpan{
+        font-family: Verdana;
+        font-size: 12px;
+    }
+    .paraTable tr div{
+        height:34px;
+        cursor:default;
+        margin-top:6px;
+        margin-bottom:6px;
+        line-height:38px;
+        margin-left:5px;
+        border:1px solid #b9b9b9;
+    }
+    .paraTable tr input{
+        width:13px;
+        height:13px;
+    }
+    #menuSet{
+        background: #f72114;
+    }
+    #menuSet:hover{
+        background: #c5070c;
+    }
+    /****等待区域***/
+    .loading{
+	    width:250px;
+	    height:56px;
+	    text-align: center;
+        margin:0 auto;
+        margin-top:390px;
+	    line-height:56px;
+	    color:#fff;
+	    display:none;
+	    padding-left:60px;
+	    font-size:15px;
+	    background: #000 url(../../images/loading.gif) no-repeat 10px 50%;
+	    opacity: 0.7;
+	    -moz-border-radius:20px;
+	    -webkit-border-radius:20px;
+	    border-radius:20px;
+	    filter:progid:DXImageTransform.Microsoft.Alpha(opacity=70);
+  }     
+    
+</style>
+<body>
+<script>
+    /****点击日历框，弹出日历****/
+    $(document).ready(function(){
+        var startTime= {
+            elem: document.getElementById('start'),
+            format: 'YYYY-MM-DD',
+            max: laydate.now(), //设定最大日期为当前日期
+            choose: function(data){
+                endTime.min = data; //开始日选好后，重置结束日的最小日期
+                endTime.start = data //将结束日的初始值设定为开始日
+            }
+        };
+        var endTime= {
+            elem: document.getElementById('end'),
+            format: 'YYYY-MM-DD',
+            max: laydate.now(), //设定最大日期为当前日期
+            choose: function(data){
+                startTime.max = data; //结束日选好后，重置开始日的最大日期
+            }
+        };
+        laydate(endTime);
+        laydate(startTime);
+    })
+    
+     $(document).ready(function(){
+	  /****点击创建分布图**/
+	  $("#menuSet").click(function(){
+		  var startTime=$("#start").val();
+		  var endTime=$("#end").val();
+		  if(startTime.length<1||endTime.length<1){
+			  console.log("hh");
+			  var txt="请选择输入要查询的时间范围。";
+			  var option = {
+						title: "提示",
+						btn: parseInt("0001",2),
+						onOk: function(){//点击确认的执行方法
+
+						}
+					}
+		      window.wxc.xcConfirm(txt, "info", option);
+			  return;
+		  }
+		  startTime=startTime.replace(new RegExp("-",'gm'),"")+"000000"
+		  endTime=endTime.replace(new RegExp("-",'gm'),"")+"000000";
+		  $.ajax({
+				type: 'post', //数据发送方式
+				dataType: 'json', //接受数据格式
+				async: true,
+				url: '../../product/makeHisGraph',
+				timeout:27*1000,
+				data: {
+					"item":"temp"+$("[name='temp']:checked").val(),
+					"startTime":startTime,
+					"endTime":endTime
+				},
+				success: function (json) {
+					$(".loading").css("display","none");
+					if (json.statusCode) {
+						$("#rainGraphImg").css("display","block");
+						$("#rainGraphImg").attr("src","../../"+json.image);
+					}
+			  		else{
+			  			  var txt=json.err;
+			  			  var option = {
+		  						title: "提示",
+		  						btn: parseInt("0001",2),
+		  						onOk: function(){//点击确认的执行方法
+
+		  						}
+		  					}
+		  		         window.wxc.xcConfirm(txt, "info", option);
+			  		}
+			  		
+			  	},
+			  	error:function(XMLHttpRequest,Error){
+			  		$(".loading").css("display","none");
+			  		var txt="绘制失败，";
+			  		txt+="失败原因：";
+			  		if(XMLHttpRequest.status==401){
+			  			 txt+="您不具有当前操作的权限<br/>";
+			  		}
+			  		else if(XMLHttpRequest.status==0){
+			  			txt+="等待超时，请稍后重试。";
+			  		}
+			  		else{
+			  			    txt+="网络错误，";
+			  			    txt+="状态码："+XMLHttpRequest.status;
+			  	    }
+			  	    var option={
+			  			    	   	title: "提示",
+			  			    	   	btn: parseInt("0001",2),
+			  			    	   	onOk: function(){//点击确认的执行方法
+			  			    	   						
+			  			    	  	}
+			  		}
+			  	   window.wxc.xcConfirm(txt, "info", option);
+			  }
+		  });
+		  $("#default").css("display","none");
+		  $("#rainGraphImg").css("display","none");
+		  $(".loading").css("display","block");
+	  })
+		    
+  })
+</script>
+<header>
+    <div class="graphTitleBox">
+        <div class="titleContext">赤水市历史温度统计</div>
+        <div class="menuBox">
+            <span>返回</span>
+        </div>
+    </div>
+</header>
+<!-----内容填充区---->
+<div class="contextArea">
+    <!--参数选择区---->
+    <div class="graphParaArea">
+        <!-----利用table来定各元素的位置-------->
+        <table class="paraTable">
+            <tr>
+                <!---用来设置margin--->
+                <td style="width:60px">
+                <td style="width:60px;">
+                    <span>图表标题:</span>
+                </td>
+                <td style="width:330px;">
+                    <div id="graphTitle">
+                        <span style="padding-left:5px;">赤水市历史温度分布图</span>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="graphParaArea">
+        <table class="paraTable">
+            <tr>
+                <!---用来设置margin--->
+                <td style="width:60px">
+                <td style="width:60px;">
+                    <span class="labelSpan">
+                        开始日期:
+                    </span>
+                </td>
+                <td class="dateArea">
+                    <input id="start"  class="laydate-icon" type="text"/>
+                </td>
+                <!---用来设置margin--->
+                <td style="width:50px">
+                <td style="width:60px;">
+                    <span class="labelSpan">
+                        结束日期:
+                    </span>
+                </td>
+                <td class="dateArea">
+                    <input   id="end" class="laydate-icon" type="text"/>
+                </td>
+                <!---用来设置margin--->
+                <td style="width:50px">
+                <td style="width:60px;">
+                    <span class="labelSpan">
+                        温度类型:
+                    </span>
+                </td>
+                <td style="width:260px;">
+                    <div id="tempTypeDiv">
+                        <form id="tempTypeForm">
+                            <input type="radio" style="margin-left:10px;" checked="checked" name="temp" value="_low"></input><span>最低温度</span>
+                            <input type="radio"  name="temp" value="_ave"></input><span>平均温度</span>
+                            <input type="radio"  name="temp" value="_high"></input><span>最高温度</span>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="graphParaArea">
+        <!-----利用table来定各元素的位置-------->
+        <table class="paraTable">
+            <tr>
+                <!---用来设置margin--->
+                <td style="width:60px"></td>
+                <td>
+                    <div class="menuBox" id="menuSet">
+                        <span>创建</span>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <!----------图表显示区域-------------->
+   <div class="graphArea">
+        <div id="default" style="height:100%;width:100%;text-align:center;"><span style="line-height:800px;font-size:26px;font-weight:bold;">选择参数，点击“创建”按钮生成分布图</span></div>
+        <div id="loading" class="loading">正在努力生成分布图，请稍后...</div>
+        <img src="" id="rainGraphImg" style="display:none; margin-left:5px;height:100%;width:1280px;">
+    </div>
+</div>
+</body>
+</html>

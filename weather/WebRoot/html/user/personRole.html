@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<script src="../../js/tools/jquery-1.9.1.min.js" type="text/javascript"></script>
+	<script src="../../js/tools/layer/layer.js"></script>
+	<script src="../../js/tools/context.js"></script>
+	<script src="../../js/tools/jquery.printArea.js"></script>	
+	<script src="../../js/tools/xlsx.core.min.js"></script>
+	<script src="../../js/tools/Blob.js"></script>
+	<script src="../../js/tools/FileSaver.js"></script>
+	<script src="../../js/tools/tableexport.js"></script>
+	<link rel="stylesheet" type="text/css" href="../../css/context.standalone.css">
+	<link rel="stylesheet" type="text/css" href="../../css/buttons.css">
+	<style>
+		html,body{
+			width:99%;
+			height:99%;
+		}
+		.tableSet{
+			float: left;
+			width: 98%;
+			height:100%;
+			min-height: 500px;
+		}
+		.tableSearch{
+			width:100%;
+			height:10%;
+			line-height: 70px;
+			overflow:hidden;
+		}
+		.printArea{
+			width:100%;
+			height:80%;
+			cursor: default;
+		}
+ 		.tableDetail{
+			width:100%;
+			height:100%;
+			cursor: default;
+		} 
+		.turnPage{
+			width:100%;
+			height:10%;
+			line-height: 70px;/*文本垂直居中*/
+			overflow:hidden;
+			text-align: center;/*文本水平居中*/
+			-moz-user-select: none;
+			-webkit-user-select: none;
+			-ms-user-select: none;
+			-khtml-user-select: none;
+			user-select: none;
+		}
+		body table>tbody>tr>td{
+			text-align: center;
+			border: solid 0px white;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+			overflow: hidden;
+		}
+		.tableSet table>tbody>tr{
+			height: 5%;/* 52px; */
+			background-color: #e4d9ff;
+		}
+		.tableSet table>tbody>tr>td:hover/*选择鼠标指针浮动在其上的元素*/
+		{
+			overflow:visible;/*默认值。内容不会被修剪，会呈现在元素框之外。*/
+		}
+		body table>thead>tr>th{
+			text-align: center;
+			vertical-align: middle;
+			color:white;
+			height: 50px;
+			background-color: #343434;
+		}
+		.tableSearch span{
+			margin-left: 30px;
+		}
+		.tableTrHover {
+			background-color: #a986bf !important;
+			color: #f9f6ff !important;
+		}
+		.btn-toolbar.top {
+			padding: 1px;
+		}
+		
+		.btn.btn-default {
+			width: 100px;
+			padding: 1px;
+		}
+		
+		.btn.btn-default.xlsx {
+			margin-left: 10px;
+		}
+	</style>
+</head>
+<body  oncontextmenu=self.event.returnValue=false>
+	<div class="tableSet">
+		<div class="tableSearch">
+			<span>组别名称</span>
+			<input id="roleNameSearch" type="text"/>
+			<button id="search" style="width:80px;height:24px;cursor:pointer;line-height:3px;margin-left:40px">查询</button>
+	   		<button id="add" style="width:80px;height:24px;cursor:pointer;line-height:3px;margin-left:10px">新增</button>
+			<button id="print" style = "width:80px;height:24px;cursor:pointer;line-height:3px;margin-left:10px">打印</button>
+		    <button id="export" style = "width:80px;height:24px;cursor:pointer;line-height:3px;margin-left:10px">导出</button>
+		</div>
+		<div class="printArea">
+		<table class="table table-bordered areaTableDetail tableDetail" id="roleTableList">
+			<thead>
+			<tr>
+				<th width="12%">编号</th>
+				<th width="12%">组别标识</th>
+				<th width="14%">组别名称</th>
+				<th width="16%">组别描述</th>
+				<th width="16%">创建用户</th>
+			</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td></td><td></td><td></td><td></td><td></td>
+				</tr>
+				<tr>
+					<td></td><td></td><td></td><td></td><td></td>
+				</tr>
+				<tr>
+					<td></td><td></td><td></td><td></td><td></td>
+				</tr>
+				<tr>
+					<td></td><td></td><td></td><td></td><td></td>
+				</tr>
+				<tr>
+					<td></td><td></td><td></td><td></td><td></td>
+				</tr>
+				<tr>
+					<td></td><td></td><td></td><td></td><td></td>
+				</tr>
+				<tr>
+					<td></td><td></td><td></td><td></td><td></td>
+				</tr>
+				<tr>
+					<td></td><td></td><td></td><td></td><td></td>
+				</tr>
+				<tr>
+					<td></td><td></td><td></td><td></td><td></td>
+				</tr>
+				<tr>
+					<td></td><td></td><td></td><td></td><td></td>
+				</tr>
+				<tr>
+					<td></td><td></td><td></td><td></td><td></td>
+				</tr>
+				<tr>
+					<td></td><td></td><td></td><td></td><td></td>
+				</tr>
+			</tbody>
+		</table>
+		</div>
+		<div class="turnPage">
+			<button style="cursor: pointer;width:60px;height:25px" id = "firstPage">首页</button>
+			<button style="margin-left: 15px;cursor: pointer;width:60px;height:25px" id = "prePage">上一页</button>
+			<button style="margin-left: 15px;cursor: pointer;width:60px;height:25px" id = "nextPage">下一页</button>
+			<button style="margin-left: 15px;cursor: pointer;width:60px;height:25px" id = "lastPage">末页</button>
+			<input style="margin-left: 15px;width:23px;" id = "choosePage"  onkeyup="(this.v=function(){this.value=this.value.replace(/[^0-9-]+/,'');}).call(this)" onblur="this.v();" ></input>
+			<button style="margin-left: 5px;cursor: pointer;width:60px;height:25px" id = goToThePage>转到</button>
+			<span style="margin-left: 25px">当前页数：</span>		
+			<span id="currentPage"></span>
+			<span>/</span>
+			<span id="totalPage"></span>
+		</div>
+	</div>
+<script>
+$(function(){
+//给页面所有的button加样式
+$(".tableSearch button").addClass("button button--wayra button--text-medium button--size-m button--round-m");
+$(".turnPage button").addClass("button button--wayra  button--text-medium button--size-m button--round-l");
+   	//定义本页面所使用的全局变量
+   	var currentPage = 1;
+   	var totalPage=1;
+   	//初始化当前页数和总页数
+   	$("#currentPage").text(currentPage);
+   	$("#totalPage").text(totalPage);
+   	//页面载入的时候将所有的组别信息加载到页面上
+   	getRealTimeWeatherIntoTable("",12,1);
+   	//右键菜单定义,只有当前行有值得时候才执行右键操作
+       context.init({preventDoubleContext: false});//初始化右键插件
+      	   $(".tableDetail").click(function(){
+      		 	var trs = $(".tableDetail tbody tr"); //获取表格中的每一行
+   			for(var i = 0;i<trs.length;i++){ //遍历表格中的每一行
+   			    if(trs[i].getElementsByTagName("td")[0].innerText!=""&&$(trs[i]).hasClass("tableTrHover")){
+   			    	$(trs[i]).addClass("hasContent");
+   			    	$(trs[i]).removeClass("noContent");
+   			    }
+   			    else{
+   			    	$(trs[i]).addClass("noContent");
+   			    	$(trs[i]).removeClass("hasContent");
+   			    }			    	
+   			}
+   			context.attach('.hasContent', [
+   		  		{header: '信息'},
+   		  		{text: "编辑组别", action:function(){
+   		  			$(window.parent.document).find(".mainArea").attr("src","html/user/personRoleEdite.html");
+           				 for(var i = 0;i<trs.length;i++){ //遍历表格中的每一行
+           				    if(trs[i].classList.contains('tableTrHover')==true){
+           				    	var groupId = trs[i].getElementsByTagName("td")[1].innerText;
+           				    	var groupName = trs[i].getElementsByTagName("td")[2].innerText;
+           				    	var groupDes = trs[i].getElementsByTagName("td")[3].innerText;
+           				    	var creater = trs[i].getElementsByTagName("td")[4].innerText;
+           				    	var localstroage = window.localStorage; 
+           				   		localstroage.setItem('groupId',groupId); 
+           				   		localstroage.setItem('groupName',groupName);
+           				 		localstroage.setItem('groupDes',groupDes);
+           				   		if(groupId!="")
+           				   			$(window.parent.document).find(".mainArea").attr("src","html/user/personRoleEdite.html");
+       	    				    }
+       		  			} },},
+   		  		{text: "删除组别", action:function(){
+           				 for(var i = 0;i<trs.length;i++){ //遍历表格中的每一行
+           				    if(trs[i].classList.contains('tableTrHover')==true){
+           				    	var groupId = trs[i].getElementsByTagName("td")[1].innerText;
+           				   		if(groupId!="")
+           				   			$.ajax({
+           				   				cache: false,
+           				   				dataType:'json',
+           				   				type: "post",
+           				   				url:"../../liaisonUnit/delLiaisonUnit",
+           				   				data:{
+           				   					"groupId":groupId
+           				   				},
+           				   				async: false,
+           				   				success: function(json) {
+           				   				if(json.statusCode){
+            				   				  layer.alert("删除成功",{icon:1});
+            				   				  getRealTimeWeatherIntoTable($("#roleNameSearch").val(),12,1);
+           				   					}
+           				   				else{
+	           				   				layer.alert(json.err, {
+	           				  				  icon: 2,
+	           				  				  skin: 'layer-ext-moon'
+	           				  				})
+           				   				}
+           				   				},
+           				   				error:function(XMLHttpRequest,Error,F,data){
+           				   					layer.confirm("访问出错了:"+XMLHttpRequest.status+Error, {
+           				   			    	   icon:2,
+           				   			    	   btn: ['确定'] //可以无限个按钮
+           				   			    	  ,btn1: function(index, layero){
+           				   		   	    		layer.alert("数据为："+data, {
+           				   		  				  icon: 2,
+           				   		  				  skin: 'layer-ext-moon'
+           				   		  				})
+           				   			    	  }
+           				   			    	});
+           				   			 	}
+           				   		});
+           				   			
+       	    				    }
+       		  			} },},		
+   		  	]); 
+      	   })
+   $("#add").click(function(){
+       $(window.parent.document).find(".mainArea").attr("src","html/user/addPersonRole.html");
+   })
+   $("#search").click(function(){
+	   getRealTimeWeatherIntoTable($("#roleNameSearch").val(),12,1);
+   })
+   $('table>tbody>tr').click(function(){
+       $(this).addClass('tableTrHover');
+       $(this).siblings().removeClass('tableTrHover');
+   })
+    //翻页操作
+    $("#prePage").click(function(){
+    	currentPage = parseInt(currentPage);
+    	if(currentPage-1<=totalPage&&currentPage-1>0){
+    		currentPage = currentPage-1;
+    		$("#currentPage").text(currentPage);
+    		var areaCode = $("#selectArea option:selected").val();
+    		getRealTimeWeatherIntoTable($("#roleNameSearch").val(),12,currentPage);
+    	}
+    	else{
+    		layer.alert("已经到了第一页",{icon:7});
+    	}
+    })
+    $("#nextPage").click(function(){
+    	currentPage = parseInt(currentPage);
+    	if(currentPage+1<=totalPage&&currentPage+1>0){
+    		currentPage = currentPage+1;
+    		$("#currentPage").text(currentPage);
+    		var areaCode = $("#selectArea option:selected").val();
+    		getRealTimeWeatherIntoTable($("#roleNameSearch").val(),12,currentPage);
+    	}
+    	else
+    		layer.alert("已经到了最后一页",{icon:7});
+    })
+    $("#firstPage").click(function(){
+   		currentPage = 1;
+   		$("#currentPage").text(currentPage);
+   		getRealTimeWeatherIntoTable($("#roleNameSearch").val(),12,currentPage);
+    })
+    $("#lastPage").click(function(){
+    	currentPage = totalPage;
+   		$("#currentPage").text(currentPage);
+   		getRealTimeWeatherIntoTable($("#roleNameSearch").val(),12,currentPage);
+    })
+    $("#goToThePage").click(function(){
+    	var currentPageTem = $("#choosePage").val();
+    	if(currentPageTem == "")
+    		layer.alert("页码不能为空",{
+    			icon:2,
+    			skin: 'layer-ext-moon'
+    		})
+    	else if(currentPageTem>totalPage||currentPageTem<1)
+    		layer.alert("请输入有效的页码",{
+    			icon:2,
+    			skin: 'layer-ext-moon'
+    		})
+    	else{
+    		currentPage = currentPageTem;
+    		$("#currentPage").text(parseInt(currentPage));
+       		getRealTimeWeatherIntoTable($("#roleNameSearch").val(),12,currentPage);
+		}
+    })
+	/**
+	向后台获取人员组别信息列表，然后将其写入表格中
+	@para groupName
+	@para rowCount
+	@para currentPage
+	**/
+	function getRealTimeWeatherIntoTable(groupName,rowCount11,currentPage11){
+	$.ajax({
+			cache: false,
+			dataType:'json',
+			type: "post",
+			url:"../../liaisonUnit/getPaginationUnit",
+			data:{
+				"groupName":groupName,
+	   			"rowCount":rowCount11,
+	   			"currentPage":currentPage11
+			},
+			async: false,
+			success: function(json) {
+			if(json.statusCode){
+				var testValue=[];
+				var units = json.units;
+				for(var i = 0;i<units.length;i++){
+					testValue.push([
+						units[i].id,
+						units[i].name,
+						units[i].description,
+						units[i].createUser
+					]);
+				}
+	   		  tableDataIn(testValue); 
+	   		  totalPage = json.totalPage;
+	   		  currentPage = currentPage11;
+	   		  $("#currentPage").text(currentPage);
+	   		  $("#totalPage").text(totalPage);
+				}
+			else{
+				var testValue=[];
+				tableDataIn(testValue);
+				layer.alert(json.err, {
+	  				  icon: 2,
+	  				  skin: 'layer-ext-moon'
+	  				})
+			}
+			},
+			error:function(XMLHttpRequest,Error,F,data){
+				layer.confirm("访问出错了:"+XMLHttpRequest.status+Error, {
+		    	   icon:2,
+		    	   btn: ['确定'] //可以无限个按钮
+		    	  ,btn1: function(index, layero){
+	   	    		layer.alert("数据为："+data, {
+	  				  icon: 2,
+	  				  skin: 'layer-ext-moon'
+	  				})
+		    	  }
+		    	});
+		 	}
+	});
+	}
+      /**
+                   向表格中写数据的操作
+      @param tabledata待写入表格中的数据
+      **/
+      	function tableDataIn(tabledata){
+          	$(".tableDetail tbody tr td").html("");
+              var tableData = tabledata;/*tableData为后台需渲染到表格中的所有数据*/
+              var allTr = $(".tableDetail tbody tr");//得到所有的行
+              var rowNum = tabledata.length;//得到数据总行数
+              var colNum = $(allTr[0]).children('td').length;//得到总列数
+      		for(var i = 0;i<rowNum;i++){
+      			$(allTr[i]).children('td')[0].innerHTML=i+1;
+      			for(var j = 1;j<colNum;j++){
+      				$(allTr[i]).children('td')[j].innerHTML=tableData[i][j-1];				
+      			}
+      		}
+      		context.destroy(".hasContent");
+      		for(var i = 0;i<allTr.length;i++){
+      			$(allTr[i]).removeClass("tableTrHover");
+      		}
+          }
+	/**
+	打印操作
+	**/
+	$("#print").click(function(){
+		$(".printArea").printArea();
+	})
+	$("#export").click(function() {
+	 if($(".btn-toolbar.top")) {
+	     $(".btn-toolbar.top").remove();
+	 }                
+	 $("table").tableExport({
+	     headings: true,                     
+	     // (Boolean), display table headings (th/td elements) in the <thead>
+	     footers: true,                      
+	     // (Boolean), display table footers (th/td elements) in the <tfoot>
+	     formats: ["xlsx", "xls"],     
+	     // (String[]), filetype(s) for the export
+	     fileName: "id",                     
+	     // (id, String), filename for the downloaded file
+	     bootstrap: true,                    
+	     // (Boolean), style buttons using bootstrap
+	     position: "top",                 
+	     // (top, bottom), position of the caption element relative to table
+	 });
+	 $(".btn.btn-default.xlsx").bind("click",function() {
+	     $(".btn-toolbar.top").remove();           
+	 });
+	 $(".btn.btn-default.xls").bind("click",function() {
+	     $(".btn-toolbar.top").remove();
+	 });
+	});
+})
+	</script>
+</body>
+</html>

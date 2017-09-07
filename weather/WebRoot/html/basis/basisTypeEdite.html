@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="../../js/tools/jquery-1.9.1.min.js" type="text/javascript"></script>
+    <title>编辑基础信息类别</title>
+</head>
+<body>
+<form>
+    <fieldset style="margin-right: 20px;">
+        <legend><b><i><font size="10" >编辑基信类别</font></i></b></legend>
+        <div style="margin-top: 20px;margin-left: 20px">
+            <div>
+                <span>基信类别名称</span>
+                <input id="basisTypeName" readonly type="text"/>
+            </div>
+            <div style="margin-top: 20px">
+                <span>基信类别描述</span>
+                <textarea rows="3" cols="21" style="vertical-align: top" id="description"></textarea>
+            </div>
+            <div style="margin-top: 40px;margin-bottom: 20px;margin-left: 40px">
+                <span style="cursor: pointer" class="d_out" onmouseover="this.className='d_over'" onmouseout="this.className='d_out'">保存</span>
+                <span id = 'back' style="margin-left: 30px;cursor: pointer" class="d_out" onmouseover="this.className='d_over'" onmouseout="this.className='d_out'">返回</span>
+            </div>
+        </div>
+    </fieldset>
+</form>
+<script>
+    $(function(){
+        document.getElementById("basisTypeName").value = "城市名片";
+        document.getElementById("description").value="介绍城市基本信息";
+        $("#back").click(function(){
+            $(window.parent.document).find(".mainArea").attr("src","html/basis/basisType.html");
+        })
+    })
+</script>
+</body>
+</html>

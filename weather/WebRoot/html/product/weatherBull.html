@@ -1,0 +1,253 @@
+<!-------------游客查看气象快报
+主界面显示当前最新的一条气象产品，在相关资产品列出最近发布的3~4条气象产品
+------------------->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+     <script src="../../js/tools/jquery-1.9.1.min.js" type="text/javascript"></script>
+    <script src="../../js/tools/xcConfirm.js" type="text/javascript" charset="utf-8"></script>
+    <link rel="stylesheet" href="../../css/xcConfirm.css" type="text/css" />
+    <style>
+        html body{
+            width:90%;
+            max-width:1500px;
+            height:110%;
+        }
+        .rightContent{
+            font-family: "Microsoft Yahei", Tahoma, SimSun;
+            font-size: 14px;
+            font-stretch: normal;
+            font-style: normal;
+            font-variant-caps: normal;
+            font-variant-ligatures: normal;
+            font-variant-numeric: normal;
+            font-weight: normal;
+            line-height: normal;
+            margin:0px 0px;
+            width:100%;
+            margin-bottom: 40px;
+            padding-bottom: 23px;
+            padding-left: 0px;
+            padding-right: 8px;
+            padding-top: 23px;
+        }
+        .graphic{
+            line-height: normal;
+            background-color: rgb(239, 242, 244);
+            margin:0 auto;
+            padding:0px 0px;
+            min-width: 800px;
+            width: 80%;
+        }
+        .title{
+            text-align: center;
+        }
+        .title span{
+            font-size: 24px;
+            color: rgb(37, 37, 37);
+        }
+        .pageContent p{
+            text-indent:2em;
+        }
+        .relativeProd{
+            margin-left: 10%;
+            font-size: 16px;
+            margin-bottom: 30px;
+            height:230px;
+        }
+        .prodHref{
+            border:solid 0px rgb(0, 0, 0);
+            border-image-outset: 0px;
+            border-image-repeat: stretch;
+            border-image-slice: 100%;
+            border-image-width: 1;
+            float: left;
+            font-family: "Microsoft Yahei", Tahoma, SimSun;
+            font-size: 12px;
+            font-stretch: normal;
+            height: 170px;
+            line-height: normal;
+            margin: 0px 0px;
+            margin-bottom: 30px;
+            padding: 0px 0px;
+            width: 250px;
+        }
+        .prodInfo{
+            text-align: center;
+        }
+        .prodInfo a{
+            text-decoration:none;
+            color: rgb(0, 0, 238);
+        }
+        .prodInfo a:hover{
+            color: rgb(85, 26, 139);
+        }
+    </style>
+    <script>
+       $(document).ready(function(){
+    	   getLastProduct(0);
+    	  
+       })
+     /***获取最近一条产品信息和相关产品**/
+     function getLastProduct(id){
+    		   $.ajax({
+   				type: 'post', //数据发送方式
+   				dataType: 'json', //接受数据格式
+   				async: true,
+   				url: '../../product/getLastProduct',
+   				timeout:3*1000,
+   				data: {
+   					"id":id,
+   					"type":"product"
+   				},
+   				success: function (json) {
+   					if (json.statusCode) {
+   						var product=json.product;
+   						var relevants=json.relevants;
+   						$("#productTitle").text(product.title);
+   						$("#productTime").text(product.time);
+   						$("#reviewer").text(product.reviewer);
+   						$("#author").text(product.author);
+   						$("#dynamicContext").html(product.context);
+   						var relevantInof="";
+   						for(var i=0;i<relevants.length;i++){
+   							relevantInof+="<div class='prodHref'>"+
+		   			                           "<div class='prodImg'>"+
+		   			                		   		"<a href=javascript:getLastProduct("+relevants[i].id+")>"+
+		   			                    				"<img width='246' height='195' src='"+"../../"+relevants[i].image+"'>"+
+		   			                				"</a>"+
+		   			            				"</div>"+
+		   			            				"<div class='prodInfo'>"+
+		   			                				"<a href=javascript:getLastProduct("+relevants[i].id+")>"+relevants[i].title+"</a>"+
+		   			            				"</div>"+
+		   			        			 "</div>"
+   						}
+   						$("#relevantContext").html(relevantInof);
+   					}
+   			  		else{
+   			  			  var txt=json.err;
+   			  			  var option = {
+   		  						title: "提示",
+   		  						btn: parseInt("0001",2),
+   		  						onOk: function(){//点击确认的执行方法
+
+   		  						}
+   		  					}
+   		  		         window.wxc.xcConfirm(txt, "info", option);
+   			  		}
+   			  		
+   			  	},
+   			  	error:function(XMLHttpRequest,Error){
+   			  		var txt="获取产品信息失败，";
+   			  		txt+="失败原因：";
+   			  		if(XMLHttpRequest.status==401){
+   			  			 txt+="您不具有当前操作的权限<br/>";
+   			  		}
+   			  		else if(XMLHttpRequest.status==0){
+   			  			txt+="等待超时，请稍后重试。";
+   			  		}
+   			  		else{
+   			  			    txt+="网络错误，";
+   			  			    txt+="状态码："+XMLHttpRequest.status;
+   			  	    }
+   			  	    var option={
+   			  			    	   	title: "提示",
+   			  			    	   	btn: parseInt("0001",2),
+   			  			    	   	onOk: function(){//点击确认的执行方法
+   			  			    	   						
+   			  			    	  	}
+   			  		}
+   			  	   window.wxc.xcConfirm(txt, "info", option);
+   			  }
+   		  });
+    	}
+    </script>
+</head>
+<body>
+<!-- 右边内容部分 start -->
+<div class="rightContent">
+
+    <!-- 文字展示 start-->
+    <div class="graphic">
+        <div class="title">
+            <span id="productTitle">
+                02月24日：24日8时至25日8时全市雨量实况
+            </span>
+            <p>
+                <span id="productTime">
+            </span>
+            </p>
+            <hr style="border:1px solid rgb(7, 109, 168);">
+        </div>
+        <div class="pageContent">
+        	<div id="dynamicContext"><!--  动态内容区-->
+
+        	</div><!--  动态内容区end-->
+
+            <hr style="border:1px solid rgba(18,18,18,0.94);">
+            <p style="text-indent:2em;">
+                呈：市  委：市委办信息科
+            </p>
+            <p style="text-indent:4em;">
+                市政府：市政府办、市应急办
+            </p>
+            <p style="text-indent:4em;">
+                市人大：市人大办公室
+            </p>
+            <p style="text-indent:4em;">
+                市政协：市政协办公室
+            </p>
+            <p style="text-indent:4em;">
+                赤水市人武部
+            </p>
+            <p style="text-indent:2em;">
+                送：市园区管委会、市农牧局、安监局、市水利局（防汛办）、市林业局（森防办）、市民政局、
+                市国土局、市教育局、市交通局、市交警大队、市消防大队、市武警中队
+            </p>
+            <hr style="border:1px solid rgba(18,18,18,0.94);">
+            <p style="text-indent:2em;">
+                制作：<span id="author"></span>&nbsp;&nbsp;&nbsp;&nbsp;签发：<span id="reviewer"></span>
+            </p>
+        </div>
+    </div><!-- 文字展示 end-->
+        <!-- 相关产品 start -->
+    <div class="relativeProd">
+        <p style="color:rgb(37, 37, 37);font-size: 16px;">相关产品</p>
+        <div id="relevantContext">
+        </div> <!-- relevantContext end -->
+<!--         <div class="prodHref"> -->
+<!--             <div class="prodImg"> -->
+<!--                 <a href="http://www.weather.com.cn/index/zxqxgg1/new_wlshtyb.shtml"> -->
+<!--                     <img width="246" height="195" src="../../images/products/zdqDefault.jpg"> -->
+<!--                 </a> -->
+<!--             </div> -->
+<!--             <div class="prodInfo"> -->
+<!--                 <a href='javascript:getLastProduct(32)'>2017年6月7日12时0分温度快报</a> -->
+<!--             </div> -->
+<!--         </div> -->
+<!--         <div class="prodHref"> -->
+<!--             <div class="prodImg"> -->
+<!--                 <a href="http://products.weather.com.cn/product/Index/index/procode/JC_HY_RDQXJC.shtml"> -->
+<!--                     <img width="246" height="195" src="../../images/products/tfDefault.jpg"> -->
+<!--                 </a> -->
+<!--             </div> -->
+<!--             <div class="prodInfo"> -->
+<!--                 <a href="http://products.weather.com.cn/product/Index/index/procode/JC_HY_RDQXJC.shtml">热带气旋监测公报</a> -->
+<!--             </div> -->
+<!--         </div> -->
+<!--         <div class="prodHref"> -->
+<!--             <div class="prodImg"> -->
+<!--                 <a href="http://www.weather.com.cn/index/zxqxgg1/qdltqyb.shtml"> -->
+<!--                     <img width="246" height="195" src="../../images/products/qdlDefault.jpg"> -->
+<!--                 </a> -->
+<!--             </div> -->
+<!--             <div class="prodInfo"> -->
+<!--                 <a href="http://www.weather.com.cn/index/zxqxgg1/qdltqyb.shtml">强对流天气公报</a> -->
+<!--             </div> -->
+<!--         </div> -->
+     </div><!-- 相关产品 end -->
+</div>
+<!-- 右边内容部分 end -->
+</body>
+</html>

@@ -1,0 +1,367 @@
+@charset "utf-8";
+/*------------------------------------------------------body------------------------------------------------------------------------------------------*/
+body{
+    font-size: 14px;
+    width: 100%;
+    background-color: #f7f7f7;
+    margin: 0 auto;
+    overflow: hidden;
+}
+/*-------------------------------------------------------menu-----------------------------------------------------------------------------------------*/
+.nav-main{
+    margin-top:40px;
+}
+.nav-main ol, ul, li {
+	list-style: none;
+    line-height: 22px;
+    margin: 0;
+    padding: 0;
+    font-size: 14px;
+    line-height: 24px;
+    color: #000;
+    font-family: 'microsoft yahei',verdana,Tahoma;
+}
+
+.nav-main ol, ul {
+	zoom: 1;
+}
+.nav-main  h1, h2, h3, h4, h5, h6 {
+	font-size: 100%;
+}
+.nav-main  a, a:link, a:visited {
+	cursor: pointer;
+    text-decoration: none;
+}
+.nav-main  a:hover {
+	cursor: pointer;
+}
+/***实况监测图标**/
+/*#realTimeNav{
+    background: url(../images/realTime.png) left center no-repeat;
+    background-size: 10px 10px;
+}*/
+/*--------------------------------------------------------主视图区域----------------------------------------------------------------------------------------*/
+
+.mainArea{
+    position:absolute;
+    margin-left:100px;
+    height:100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background-color: #f7f7f7;
+}
+
+/*一级导航*/
+.nav-main{
+	position: fixed;
+	top: 0;
+	z-index: 12;
+	height: 100%;
+	width: 100px;
+	color: #fff;
+	background: #111213;
+}
+.nav-main a{color: #fff;}
+.nav-box{
+	position: relative;
+	perspective: 200px;
+	-webkit-perspective: 200px;
+	transform-style: preserve-3d;
+	-webkit-transform-style: preserve-3d;
+	height: 100%;
+	z-index: 99;
+}
+.nav-ul li a{
+	display: block;
+	margin-bottom:20px;
+	width: 100px;
+	height:70px;
+	line-height:70px;
+	overflow: hidden;
+	text-align:center;
+	position: relative;
+	transition: all .5s;
+	-moz-transition: all .5s;
+	-webkit-transition: all .5s;
+	-o-transition: all .5s;
+}
+.nav-ul li a:before{
+	content: '';
+	position: absolute;
+	left: -240px;
+	top: 0px;
+	width: 200px;
+	height: 100%;
+	background: #629feb;
+	z-index: 1;
+	transform: skew(30deg, 0);
+	-webkit-transform: skew(30deg, 0);
+	-ms-transform: skew(30deg, 0);
+	-moz-transform: skew(30deg, 0);
+	-o-transform: skew(30deg, 0);
+	transition: all .5s;
+	-moz-transition: all .5s;
+	-webkit-transition: all .5s;
+	-o-transition: all .5s;
+}
+.nav-ul li a:hover{
+    background: #357dd7;
+}
+.nav-ul li a:hover:before{
+    left: -30px;
+}
+.nav-ul li a:after{
+	content: '';
+	position: absolute;
+	width: 100%;
+	height: 30px;
+	left: 0;
+	top: 20px;
+	z-index: 1;
+}
+.nav-ul li a span{
+	display: block;
+	/*margin-top: 60px;*/
+	position: relative;
+	z-index: 1;
+}
+.nav-slide{
+	position: fixed;
+	left: 100px;
+	top: 0;
+	width: 150px;
+	height: 100%;
+	background: #252829;
+	transform: rotateY(120deg);
+	-webkit-transform: rotateY(120deg);
+	-moz-transform: rotateY(120deg);
+	-o-transform: rotateY(120deg);
+	-ms-transform: rotateY(120deg);
+	z-index: 99;
+	visibility: hidden;
+	transform-origin: 0 0;
+	-webkit-transform-origin: 0 0;
+	-moz-transform-origin: 0 0;
+	-o-transform-origin: 0 0;
+	-ms-transform-origin: 0 0;
+	backface-visibility: hidden;
+	-webkit-backface-visibility: hidden;
+	transition: all .5s;
+	-webkit-transition: all .5s;
+	-moz-transition: all .5s;
+	-o-transition: all .5s;
+	transition-timing-function: cubic-bezier(.08, .72, .71, .96);
+	-webkit-transition-timing-function: cubic-bezier(.08, .72, .71, .96);
+}
+.nav-slide.hover{
+	transform: rotateY(0deg);
+	-webkit-transform: rotateY(0deg);
+	-moz-transform: rotateY(0deg);
+	-o-transform: rotateY(0deg);
+	-ms-transform: rotateY(0deg);
+	z-index: 15;
+	visibility: visible;
+}
+
+/*二级菜单*/
+.nav-slide-o li a{
+	line-height: 50px;
+	display: block;
+	padding: 0 20px;
+	font-size: 14px;
+	overflow: hidden;
+	text-align: left;
+	position: relative;
+	transition: all .5s;
+	-webkit-transition: all .5s;
+	-moz-transition: all .5s;
+	-o-transition: all .5s;
+}
+.nav-slide-o li a:before{
+	content: '';
+	position: absolute;
+	left: -230%;
+	top: 0px;
+	width: 200%;
+	height: 100%;
+	background: #629feb;
+	z-index: 1;
+	transform: skew(30deg, 0);
+	-webkit-transform: skew(30deg, 0);
+	-moz-transform: skew(30deg, 0);
+	-o-transform: skew(30deg, 0);
+	-ms-transform: skew(30deg, 0);
+	transition: all .5s;
+	-webkit-transition: all .5s;
+	-moz-transition: all .5s;
+	-o-transition: all .5s;
+}
+.nav-slide-o li a:hover{
+    background: #357dd7;
+}
+.nav-slide-o li a:hover:before{
+    left: -60px;
+}
+.nav-slide-o li a span{
+    position: relative;
+    z-index: 1;
+}
+.nav-slide-o {
+    display: none;
+}
+
+
+/*header 用户认证栏*/
+.userLog {
+	width: 100%;
+	height: 40px;
+	background-color: #000000;
+	font-size: 14px;
+	font-family: "Microsoft YaHei";
+	line-height: 40px;
+}
+.logBox{
+    color: white;
+    float: left;
+    text-align: left;
+    font-size: 20px;
+    margin-left:10px;
+}
+
+.userBox{
+    float: right;
+    float: right;
+    margin-right: 10px;
+}
+.userLog a {
+	color: white;
+}
+.account {
+	float: left;
+	width: 110px;
+	background: url(../images/account.png) left center no-repeat;
+	background-size: 30px 30px;
+	text-align: center;
+}
+
+.manage {
+	float: left;
+	width: 120px;
+	background: url(../images/manage.png) left center no-repeat;
+	background-size: 30px 30px;
+	text-align: center;
+}
+#load {
+	width: 100%;
+	height: 100%;
+	background-color: rgba(255,255,255,0);
+	display: none;
+	position: absolute;
+	z-index: 3
+}
+
+#loaddiv {
+	background-color: white;
+	position: absolute;
+	width: 520px;
+	margin: 10% 0 0 35%;
+	z-index: 4
+}
+.accmngdiv,
+.pswddiv {
+	background-color: #E6E6FA;
+	border-style: solid;
+	border-width: 1px;
+	border-color: black;
+	padding: 10px
+}
+
+.currentname {
+	text-align: center
+}
+
+.currentnamediv {
+	width: 500px
+}
+
+.edit {
+	width: 50%
+}
+
+.submit {
+	float: right;
+	width: 25%;
+	margin-right: 40px
+}
+
+label {
+	display: block
+}
+
+label>span {
+	position: relative;
+	float: left;
+	width: 200px;
+	height: 1em;
+	text-align: justify
+}
+.accinfo {
+	display: none;
+	background-color: white;
+	border-style: solid;
+	border-width: 1px;
+	border-color: rgb(136, 136, 136);
+	min-width: 230px;
+	margin-top: 2px;
+	right: 40px;
+	position: absolute;
+	z-index: 2
+}
+
+.accmng,
+.pswd,
+.logout {
+	color: black
+}
+
+.accmng:hover,
+.pswd:hover,
+.logout:hover {
+	cursor: pointer
+}
+
+.head-icon,
+.email-icon,
+.phone-icon {
+	width: 14px;
+	height: 14px
+}
+
+.button {
+	border-top: 1px solid black;
+	background-color: rgb(234, 234, 234)
+}
+
+.closeinfo {
+	position: absolute;
+	top: -15px;
+	right: 5px;
+	color: black;
+	font-size: 40px;
+	font-weight: bold;
+	transition: 0.3s;
+}
+
+.closeinfo:hover,
+.closeinfo:focus {
+	color: red;
+	text-decoration: none;
+	cursor: pointer;
+}
+#notification:focus,
+.admin:hover,
+.admin:focus,
+.manager:hover,
+.manager:focus {
+	color: rgb(234, 234, 234)
+}
